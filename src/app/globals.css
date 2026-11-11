@@ -49,7 +49,7 @@ body {
 /* Touch screens have no hover: a tooltip would only linger after a tap. */
 @media (pointer: coarse) {
   .float-tooltip-kap.float-tooltip-kap {
-    display: none;
+    display: none !important;
   }
 }
 
@@ -76,4 +76,127 @@ body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--color-amber-300);
+}
+
+/* ---- Poster markers (src/components/globe/posters/htmlPosters.ts) ---------------------------
+   A zero-size anchor sits on the pin; the poster stands on it. Posters ignore the pointer (the
+   globe hit-tests them) so drag and wheel-zoom keep working over them. */
+
+.globe-root[data-poster-hover] {
+  cursor: pointer !important;
+}
+
+/* The tooltip library sets display inline, hence !important. */
+.globe-root[data-poster-hover] .float-tooltip-kap {
+  display: none !important;
+}
+
+.poster-anchor {
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+/* The pin. */
+.poster-anchor::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--color-amber-300);
+  box-shadow: 0 0 0 2px rgb(2 6 23 / 0.85);
+  transition: opacity 200ms ease;
+}
+
+.poster {
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  width: var(--poster-width, 36px);
+  aspect-ratio: 2 / 3;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: var(--color-slate-900);
+  box-shadow:
+    0 8px 20px -8px rgb(0 0 0 / 0.9),
+    0 0 0 1px rgb(255 255 255 / 0.18);
+  transform: translateX(-50%);
+  transform-origin: 50% 100%;
+  pointer-events: none;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    opacity 200ms ease,
+    visibility 200ms;
+}
+
+.poster img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.poster:focus-visible {
+  outline: 2px solid var(--color-amber-300);
+  outline-offset: 2px;
+}
+
+.poster-label {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgb(2 6 23 / 0.88);
+  color: var(--color-slate-50);
+  font: 500 11px/1.5 var(--font-sans);
+  white-space: nowrap;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.poster-anchor[data-hover],
+.poster-anchor[data-selected] {
+  z-index: 100000 !important; /* above the layer's distance-based z-order */
+}
+
+.poster-anchor[data-hover] .poster,
+.poster:focus-visible {
+  transform: translateX(-50%) scale(1.18);
+}
+
+.poster-anchor[data-selected] .poster {
+  transform: translateX(-50%) scale(1.25);
+  box-shadow:
+    0 10px 24px -8px rgb(0 0 0 / 0.9),
+    0 0 0 2px var(--color-amber-300);
+}
+
+.poster-anchor[data-hover] .poster-label,
+.poster:focus-visible .poster-label {
+  opacity: 1;
+}
+
+/* Far side of the globe: gone, and out of the tab order. */
+.poster-anchor[data-hidden] .poster {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.poster-anchor[data-hidden]::after {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poster,
+  .poster-label,
+  .poster-anchor::after {
+    transition: none;
+  }
 }

@@ -36,6 +36,8 @@ The first `pnpm test:e2e` needs a Playwright browser: `pnpm exec playwright inst
 
 - **Drag** to rotate, **scroll / pinch** to zoom. The globe turns slowly when left alone.
 - **Hover** a country to highlight it; **click / tap** to focus the camera on it.
+- **Click / tap a poster** to open the film: the camera flies to it and every production country
+  lights up. Posters are also reachable with **Tab** and **Enter**.
 - **Back to globe** or **Esc** zooms back out.
 - With _reduce motion_ turned on in your OS, auto-rotation is off and camera moves are instant.
 
@@ -46,6 +48,9 @@ src/components/globe/MovieGlobe.tsx   app state (global / country mode), overlay
 src/components/globe/GlobeScene.tsx   the only file that touches react-globe.gl / three.js
 src/lib/geo/countries.ts              GeoJSON -> countries, bounds, point-in-country
 src/lib/geo/camera.ts                 viewpoints and focus altitude
+src/components/globe/posters/         poster markers (HTML) and the sprite spike
+src/lib/movies/                       poster art, size and how many to show
+src/data/movies.ts                    mock catalogue (M2)
 ```
 
 `GlobeScene` is loaded with `next/dynamic` and `ssr: false`: WebGL only exists in the browser.
@@ -64,4 +69,11 @@ to software WebGL, which is slower.
 ## Data
 
 Country boundaries: [Natural Earth](https://www.naturalearthdata.com/) 1:110m Admin 0 – Countries,
-public domain. No movie data or poster images yet — see milestones M2–M4.
+public domain. Films are a hand-entered mock list of 20 (`src/data/movies.ts`); poster art is
+generated, not the studios' posters. Real data comes in M4.
+
+## Debug panel
+
+Add `?debug` to the URL for a frame-rate meter and the poster-rendering controls, e.g.
+`/?debug&renderer=sprites&posters=1000&cap=0`. See
+[`docs/decisions/0001-poster-rendering.md`](docs/decisions/0001-poster-rendering.md).

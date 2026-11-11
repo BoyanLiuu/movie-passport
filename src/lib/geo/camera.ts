@@ -59,3 +59,18 @@ export const globalViewFrom = (
   lng: current.lng,
   altitude: globalAltitude(aspect),
 });
+
+/** Close enough to read the poster and see its city, far enough to keep the region in view. */
+export const MOVIE_FOCUS_ALTITUDE = 0.9;
+
+export const movieView = (movie: { lat: number; lng: number }, aspect?: number): PointOfView => ({
+  lat: movie.lat,
+  lng: movie.lng,
+  altitude: MOVIE_FOCUS_ALTITUDE * aspectFactor(aspect ?? 16 / 9),
+});
+
+/**
+ * Something the camera should frame. `key` identifies it (the camera moves when it changes);
+ * `view` computes the viewpoint for the current screen shape.
+ */
+export type FocusTarget = { key: string; view: (aspect: number) => PointOfView };

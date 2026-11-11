@@ -7,13 +7,14 @@ How to read this: `[x]` done and verified, `[ ]` not yet. Each milestone is done
 | ------------------------------ | -------------- | -------------------------------------------------------- |
 | M0 — Foundation                | ✅ Done        | `pnpm dev` serves the app on http://127.0.0.1:3002       |
 | M1 — Interactive Earth         | ✅ Done        | Rotate, hover and click countries; camera focuses; reset |
-| M2 — Placeholder movie posters | ⚪ Next        | 15–20 generated posters on the globe                     |
-| M3 — Mode A ↔ B                | ⚪ Not started | Country view lists its movies; URL sync; search          |
+| M2 — Placeholder movie posters | ✅ Done        | 20 generated posters; click one to open the film         |
+| M3 — Mode A ↔ B                | ⚪ Next        | Country view lists its movies; URL sync; search          |
 | M4 — Real movie data           | ⚪ Not started | Licensed metadata from a chosen source                   |
 | M5 — Polish & ship (optional)  | ⚪ Not started | Deployed site, a11y and performance budgets met          |
 
-**Last verified:** 2026-11-10 — `pnpm check` green (lint, typecheck, 28 unit tests, build);
-`pnpm test:e2e` 35 passed (desktop Chrome + Pixel 7 emulation), stable over 3 repeats.
+**Last verified:** 2026-11-11 — `pnpm check` green (lint, typecheck, 44 unit tests, build);
+`pnpm test:e2e` 54 passed, 4 skipped (mouse-only tests on the phone project), desktop Chrome + Pixel 7
+emulation, stable over 2 repeats.
 
 ---
 
@@ -60,14 +61,24 @@ Worth a manual look (not automatable):
 Extras beyond the brief: reduced-motion support (no auto-rotation, instant moves), loading / fetch
 error / WebGL-unavailable states, screen-reader announcements.
 
-## M2 — Placeholder movie posters
+## M2 — Placeholder movie posters ✅
 
-- [ ] Mock movies: id, title, year, country codes, coordinates, generated poster
-- [ ] 10–20 posters on the globe via the HTML Elements layer
-- [ ] Back-hemisphere posters hidden; poster size tuned for readability
-- [ ] Poster hover/click interaction
-- [ ] Spike: Three.js textured planes vs HTML markers, written up in `docs/decisions/`
-- [ ] Visible-poster cap by zoom level; dev FPS meter
+- [x] Mock movies: id, title, year, director, production countries, pin coordinates, generated
+      poster art (20 films; co-productions such as Amélie FR+DE, Crouching Tiger TW+CN+US)
+- [x] 10–20 posters on the globe via the HTML Elements layer
+- [x] Back-hemisphere posters hidden; poster size grows with zoom (26–88 px)
+- [x] Poster hover/click interaction: hover label, click/tap/keyboard opens a film card, camera
+      flies to it, every production country lights up; country chips switch to that country
+- [x] Spike: Three.js sprites vs HTML markers, measured and written up in
+      [`docs/decisions/0001-poster-rendering.md`](docs/decisions/0001-poster-rendering.md)
+- [x] Visible-poster cap by zoom level (12 / 16 / 60); dev FPS meter (`/?debug`)
+
+Also fixed along the way: dragging and scroll-zooming keep working when the pointer is over a poster;
+posters never draw over the info panels.
+
+Worth a manual look:
+
+- [ ] Poster size and density feel right on your screen (try `/?debug` to see the frame rate)
 
 ## M3 — Mode A ↔ B
 

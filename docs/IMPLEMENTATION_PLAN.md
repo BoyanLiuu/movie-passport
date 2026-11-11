@@ -110,12 +110,16 @@ used in the sibling projects, Vitest, Playwright. Dev server bound to `127.0.0.1
 
 ### M2 — Placeholder movie posters (brief §6)
 
-- `data/movies.ts`: 15–20 mock films `{ id, title, year, countries: iso2[], lat, lng, poster }`. Real titles, but
-  **generated** poster art (SVG gradient + title) — no copyrighted images until M4 settles rights.
-- Render posters with the HTML Elements layer; hide back-hemisphere posters (`htmlElementVisibilityModifier`).
-- Spike: the same posters as Three.js textured planes/sprites behind a dev toggle. Record the comparison (FPS,
-  occlusion, crispness, click handling) in `docs/decisions/0001-poster-rendering.md`.
-- Dev-only FPS meter; poster cap by zoom level.
+- `src/data/movies.ts`: 20 mock films `{ id, title, originalTitle, year, director, countries: iso2[], place,
+lat, lng, rank }`. Real titles, but **generated** poster art (`src/lib/movies/poster.ts`: SVG gradient,
+  motif, title) — no copyrighted images until M4 settles rights.
+- Posters render with the HTML Elements layer; back-hemisphere posters are hidden by the layer's horizon test.
+  Markers ignore the pointer and the globe hit-tests them, so drag and wheel-zoom work over posters.
+- A third mode, `{ kind: "movie" }`: the camera flies to the poster, every production country is highlighted,
+  and a film card offers each country as a chip.
+- Spike: the same posters as three.js sprites behind `?debug&renderer=sprites`; result in
+  [`docs/decisions/0001-poster-rendering.md`](decisions/0001-poster-rendering.md) — HTML markers, capped at 60.
+- `?debug` panel: FPS, renderer, stress-test poster count, cap toggle.
 
 ### M3 — Mode A ↔ B (brief §7)
 
@@ -168,3 +172,6 @@ Deploying is an outward-facing step and is done only with explicit sign-off.
 | 5   | Resolve clicks via `toGlobeCoords` + point-in-polygon, not `onPolygonClick` (its 50 ms throttled raycast misses quick taps) | M1        |
 | 6   | E2E: opt-in `NEXT_PUBLIC_GLOBE_TEST_HOOK` build in `.next-e2e/`; GPU (Metal) Chromium on macOS                              | M1        |
 | 7   | Playwright pinned to 1.64.1 to share browsers with `avatar-playground`                                                      | M1        |
+| 8   | Posters as HTML markers, max 60 rendered; sprites kept behind `?debug` (decision record 0001)                               | M2        |
+| 9   | Poster markers are click-through; the globe hit-tests them so drag/zoom work over posters                                   | M2        |
+| 10  | Movie mode highlights every production country; poster pinned at a city tied to the film                                    | M2        |

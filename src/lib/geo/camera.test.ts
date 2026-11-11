@@ -9,6 +9,8 @@ import {
   initialView,
   MAX_FOCUS_ALTITUDE,
   MIN_FOCUS_ALTITUDE,
+  MOVIE_FOCUS_ALTITUDE,
+  movieView,
 } from "./camera";
 import type { Bounds, Country } from "./countries";
 
@@ -64,5 +66,19 @@ describe("viewpoints", () => {
   it("focuses on the label point", () => {
     const country = { labelLat: 46.7, labelLng: 2.55, bounds: bounds(9, 13, 46) } as Country;
     expect(focusView(country)).toMatchObject({ lat: 46.7, lng: 2.55 });
+  });
+});
+
+describe("movieView", () => {
+  it("centres on the poster's pin", () => {
+    expect(movieView({ lat: 37.57, lng: 126.98 })).toEqual({
+      lat: 37.57,
+      lng: 126.98,
+      altitude: MOVIE_FOCUS_ALTITUDE,
+    });
+  });
+
+  it("pulls back on portrait screens", () => {
+    expect(movieView({ lat: 0, lng: 0 }, 9 / 19).altitude).toBeGreaterThan(MOVIE_FOCUS_ALTITUDE);
   });
 });
