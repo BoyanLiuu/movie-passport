@@ -26,7 +26,13 @@ import {
 import { countryAt, type Country } from "@/lib/geo/countries";
 import { filmCountLabel } from "@/lib/catalogue";
 import { countryTooltipHtml, globeTheme as theme, landColorFor } from "@/lib/globe/theme";
-import { posterLimit, posterWidth, visiblePosters } from "@/lib/movies/posters";
+import { angularDistance } from "@/lib/geo/countries";
+import {
+  MAX_RENDERED_POSTERS,
+  posterLimit,
+  posterWidth,
+  selectPosters,
+} from "@/lib/movies/posters";
 import { createPosterElement, posterAt, setPosterVisibility } from "./posters/htmlPosters";
 import { createSpritePosters, type SpritePosters } from "./posters/spritePosters";
 import { createStarfield } from "./starfield";
@@ -44,7 +50,7 @@ export type GlobeSceneProps = {
   /** Films in the catalogue per country id: lit countries, and the count in the tooltip. */
   filmCounts: ReadonlyMap<string, number>;
   movies: Movie[];
-  /** In country view, the films that keep their posters; the rest fade out. null shows all. */
+  /** In country view, the films that keep their posters (those from it); the rest fade out. */
   focusMovieIds: string[] | null;
   selectedMovieId: string | null;
   /** A film highlighted from outside the globe (e.g. hovering it in the country's film list). */
@@ -128,7 +134,14 @@ const GlobeScene = ({
 
   // ---- Posters -------------------------------------------------------------------------------
 
-  const [posterCap, setPosterCap] = useState(() => posterLimit(initialView().altitude));
+  // Where the camera looked when the poster set was last chosen. Updated only when the camera has
+  // moved a few degrees or changed zoom band, so the set doesn't churn every frame.
+  const [posterView, setPosterView] = useState<{
+    lat: number;
+    lng: number;
+    altitude: number;
+  } | null>(null);
+  const posterViewRef = useRef(posterView);
   const focusKey = focusMovieIds?.join(",") ?? null;
   const focusSet = useMemo(
     () => (focusKey === null ? null : new Set(focusKey ? focusKey.split(",") : [])),
@@ -136,12 +149,30 @@ const GlobeScene = ({
   );
   // The capped global set, plus the focused country's films. Posters outside the focus stay
   // rendered but faded out (data-out), so they can animate out and back in.
+  // The capped, spaced set for the current view. In country view, the country's own films are
+  // chosen the same way (best first, at most MAX_RENDERED_POSTERS); the global set stays rendered
+  // but faded out (data-out) so posters animate both ways.
   const shownPosters = useMemo(() => {
-    const base = visiblePosters(movies, capPosters ? posterCap : Infinity, selectedMovieId);
-    if (!focusSet) return base;
-    const extra = movies.filter((m) => focusSet.has(m.id) && !base.includes(m));
-    return [...base, ...extra];
-  }, [movies, capPosters, posterCap, selectedMovieId, focusSet]);
+    const altitude = posterView?.altitude ?? initialView().altitude;
+    const always = new Set(selectedMovieId ? [selectedMovieId] : []);
+    const pick = (list: Movie[], limit: number, spacing?: number) =>
+      selectPosters(list, {
+        limit: capPosters ? limit : Infinity,
+        center: capPosters ? posterView : null,
+        altitude,
+        always,
+        spacing,
+      });
+    const global = pick(movies, posterLimit(altitude));
+    if (!focusSet) return global;
+    const local = pick(
+      movies.filter((m) => focusSet.has(m.id)),
+      MAX_RENDERED_POSTERS,
+      2.5,
+    );
+    const ids = new Set(local.map((m) => m.id));
+    return [...local, ...global.filter((m) => !ids.has(m.id))];
+  }, [movies, capPosters, posterView, selectedMovieId, focusSet]);
   const focusSetRef = useRef(focusSet);
   const anchors = useRef(new Map<string, HTMLElement>());
   // While the pointer is on a poster, the country underneath shouldn't light up as well.
@@ -172,12 +203,24 @@ const GlobeScene = ({
       const px = posterWidth(altitude);
       containerRef.current?.style.setProperty("--poster-width", `${px}px`);
       sprites.current?.resize(spriteWidth(px, altitude));
-      setPosterCap(posterLimit(altitude));
     },
     [containerRef, spriteWidth],
   );
   const handleZoom = useCallback(
-    (pov: { altitude: number }) => applyAltitude(pov.altitude),
+    (pov: { lat: number; lng: number; altitude: number }) => {
+      applyAltitude(pov.altitude);
+      const last = posterViewRef.current;
+      const moved =
+        !last ||
+        angularDistance(last.lat, last.lng, pov.lat, pov.lng) > 4 ||
+        posterLimit(last.altitude) !== posterLimit(pov.altitude) ||
+        Math.abs(last.altitude - pov.altitude) > 0.25;
+      if (moved) {
+        const view = { lat: pov.lat, lng: pov.lng, altitude: pov.altitude };
+        posterViewRef.current = view;
+        setPosterView(view);
+      }
+    },
     [applyAltitude],
   );
 
@@ -257,7 +300,7 @@ const GlobeScene = ({
 
     const view = initialView(aspect());
     globe.pointOfView(view);
-    applyAltitude(view.altitude);
+    handleZoom(view);
 
     const controls = globe.controls();
     const radius = globe.getGlobeRadius();
@@ -273,7 +316,7 @@ const GlobeScene = ({
       globe.scene().remove(stars);
       dispose();
     };
-  }, [ready, applyAltitude, aspect]);
+  }, [ready, handleZoom, aspect]);
 
   // Camera follows the focus target, or zooms back out when it is cleared.
   useEffect(() => {
@@ -347,19 +390,22 @@ const GlobeScene = ({
   );
   const altitude = useCallback(
     (d: object) => {
-      const { id } = asCountry(d);
-      if (highlighted.has(id)) return theme.altitude.selected;
-      if (id === hoveredCountryId) return theme.altitude.hover;
-      return theme.altitude.base;
+      const { id, kind } = asCountry(d);
+      // Discs for small places sit above the bigger shape they may overlap (Hong Kong on China).
+      const lift = kind === "place" ? theme.altitude.place : 0;
+      if (highlighted.has(id)) return theme.altitude.selected + lift;
+      if (id === hoveredCountryId) return theme.altitude.hover + lift;
+      return theme.altitude.base + lift;
     },
     [highlighted, hoveredCountryId],
   );
   // No tooltip on highlighted countries: the panel already names them.
   const label = useCallback(
     (d: object) => {
-      const { id, name, continent } = asCountry(d);
+      const { id, name, continent, note } = asCountry(d);
       if (highlighted.has(id)) return "";
-      return countryTooltipHtml(name, continent, filmCountLabel(filmCounts.get(id) ?? 0));
+      const films = filmCountLabel(filmCounts.get(id) ?? 0);
+      return countryTooltipHtml(name, note ?? continent, films);
     },
     [highlighted, filmCounts],
   );

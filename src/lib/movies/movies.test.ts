@@ -16,7 +16,9 @@ import {
   posterLimit,
   posterWidth,
   stressPosters,
-  visiblePosters,
+  horizonDegrees,
+  posterSeparation,
+  selectPosters,
 } from "./posters";
 
 const countries = parseCountries(
@@ -95,13 +97,57 @@ describe("poster visibility", () => {
     expect(posterLimit(0.6)).toBe(MAX_RENDERED_POSTERS);
   });
 
-  it("keeps the highest-ranked posters, plus the selected one", () => {
-    const top = visiblePosters(MOCK_MOVIES, 3);
-    expect(top.map((m) => m.rank)).toEqual([10, 10, 10]);
-    const withSelected = visiblePosters(MOCK_MOVIES, 3, "leviathan");
-    expect(withSelected).toHaveLength(4);
-    expect(withSelected.at(-1)?.id).toBe("leviathan");
-    expect(visiblePosters(MOCK_MOVIES, 3, "parasite")).toHaveLength(3);
+  it("knows how far the camera can see", () => {
+    expect(horizonDegrees(1)).toBeCloseTo(60);
+    expect(horizonDegrees(2.4)).toBeGreaterThan(horizonDegrees(0.5));
+  });
+
+  const ids = (list: { id: string }[]) => list.map((m) => m.id);
+
+  it("only counts posters facing the camera", () => {
+    // Looking at Europe: Seoul, Tokyo and Wellington are behind the globe.
+    const shown = ids(
+      selectPosters(MOCK_MOVIES, { limit: 100, center: { lat: 45, lng: 10 }, altitude: 1 }),
+    );
+    expect(shown).toContain("amelie");
+    expect(shown).not.toContain("parasite");
+    expect(shown).not.toContain("fellowship-of-the-ring");
+  });
+
+  it("lets every country show its best film before any shows a second", () => {
+    // India has two films (Pather Panchali, RRR); with room for one per country, only the better
+    // ranked appears until every other facing country has one. (Zoomed in, so spacing allows both.)
+    const view = { center: { lat: 20, lng: 80 }, altitude: 1 };
+    const all = selectPosters(MOCK_MOVIES, { limit: 100, ...view });
+    const countries = new Set(all.map((m) => m.home));
+    const onePerCountry = ids(selectPosters(MOCK_MOVIES, { limit: countries.size, ...view }));
+    expect(onePerCountry.filter((id) => id === "rrr" || id === "pather-panchali")).toHaveLength(1);
+    expect(ids(all)).toEqual(expect.arrayContaining(["rrr", "pather-panchali"]));
+  });
+
+  it("keeps posters apart, more so when zoomed out", () => {
+    expect(posterSeparation(2.4)).toBeGreaterThan(posterSeparation(0.5));
+    // Seoul and Tokyo are ~10° apart: one poster from the whole globe away, both up close.
+    const far = ids(
+      selectPosters(MOCK_MOVIES, { limit: 100, center: { lat: 36, lng: 132 }, altitude: 2.4 }),
+    );
+    const near = ids(
+      selectPosters(MOCK_MOVIES, { limit: 100, center: { lat: 36, lng: 132 }, altitude: 0.8 }),
+    );
+    expect(far.filter((id) => id === "parasite" || id === "spirited-away")).toHaveLength(1);
+    expect(near).toEqual(expect.arrayContaining(["parasite", "spirited-away"]));
+  });
+
+  it("ranks within the limit and always adds the selected films", () => {
+    const shown = selectPosters(MOCK_MOVIES, { limit: 3, center: null, altitude: 0.5 });
+    expect(shown.map((m) => m.rank)).toEqual([10, 10, 10]);
+    const withSelected = selectPosters(MOCK_MOVIES, {
+      limit: 3,
+      center: null,
+      altitude: 0.5,
+      always: new Set(["leviathan"]),
+    });
+    expect(ids(withSelected)).toEqual([...ids(shown), "leviathan"]);
   });
 
   it("builds reproducible stress sets that start with the real films", () => {

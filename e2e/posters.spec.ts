@@ -1,5 +1,4 @@
 import { expect, test, type Page } from "@playwright/test";
-import { MOCK_MOVIES } from "../src/data/movies";
 import { aimAt, nextFrames, openGlobe, pointOfView, press, trackErrors } from "./helpers";
 
 const poster = (page: Page, id: string) => page.locator(`[data-poster-id="${id}"] .poster`);
@@ -15,25 +14,34 @@ const centreOf = async (page: Page, id: string) => {
 const lookAtEurope = (page: Page) => aimAt(page, 45, 15, 1);
 
 test.describe("posters", () => {
-  test("show the top-ranked films when zoomed out, and hide the far side", async ({ page }) => {
+  test("show films from the side facing the camera, a dozen at most when zoomed out", async ({
+    page,
+  }) => {
     const errors = trackErrors(page);
     await openGlobe(page);
-    await expect(shown(page)).toHaveAttribute("data-posters-shown", "12");
+    const count = Number(await shown(page).getAttribute("data-posters-shown"));
+    expect(count).toBeGreaterThan(5);
+    expect(count).toBeLessThanOrEqual(12);
     await expect(poster(page, "amelie")).toBeVisible(); // Paris faces the camera
-    await expect(poster(page, "parasite")).toBeHidden(); // Seoul is behind the globe
-    await expect(page.locator('[data-poster-id="leviathan"]')).toHaveCount(0); // ranked out
+    await expect(poster(page, "leviathan")).toBeVisible(); // Russia's best film gets its turn
+    // Seoul and Wellington are behind the globe: not rendered at all.
+    await expect(page.locator('[data-poster-id="parasite"]')).toHaveCount(0);
+    await expect(page.locator('[data-poster-id="fellowship-of-the-ring"]')).toHaveCount(0);
     expect(errors).toEqual([]);
   });
 
-  test("grow and multiply as the camera zooms in", async ({ page }) => {
+  test("grow as the camera zooms in, and follow where it looks", async ({ page }) => {
     await openGlobe(page);
     const far = await centreOf(page, "amelie");
-    await aimAt(page, 45, 15, 1.3);
-    await expect(shown(page)).toHaveAttribute("data-posters-shown", "16");
     await aimAt(page, 45, 15, 0.8);
-    await expect(shown(page)).toHaveAttribute("data-posters-shown", String(MOCK_MOVIES.length));
     await nextFrames(page);
     expect((await centreOf(page, "amelie")).width).toBeGreaterThan(far.width * 1.5);
+
+    // Turn to East Asia: Seoul and Tokyo come into view, Paris leaves it.
+    await aimAt(page, 36, 132, 1.2);
+    await expect(poster(page, "parasite")).toBeVisible();
+    await expect(poster(page, "spirited-away")).toBeVisible();
+    await expect(page.locator('[data-poster-id="amelie"]')).toHaveCount(0);
   });
 
   test("open the film and light up every production country", async ({ page }) => {

@@ -16,7 +16,9 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "data:countries": "node scripts/prepare-countries.mjs",
-    "check": "eslint && next typegen && tsc --noEmit && vitest run && next build"
+    "check": "eslint && next typegen && tsc --noEmit && vitest run && next build",
+    "data:catalogue": "node --env-file-if-exists=.env.local scripts/fetch-catalogue.mjs",
+    "data:places": "node scripts/prepare-places.mjs"
   },
   "dependencies": {
     "next": "16.4.6",

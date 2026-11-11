@@ -1,6 +1,8 @@
-// M2 mock catalogue: 20 well-known films, one or two per country, to design poster placement and
-// interaction before real data (M4). Titles, years, directors and production countries are real
-// but hand-entered; the poster art is generated (src/lib/movies/poster.ts), not the studios'.
+// The film model shared by the mock catalogue (below) and the TMDB catalogue
+// (src/lib/data/tmdbCatalogue.ts, built by scripts/fetch-catalogue.mjs).
+//
+// The mock is 20 well-known films hand-entered for M2–M3, with generated poster art. The app uses it
+// when there is no TMDB catalogue (no token yet) and in the browser tests, which need fixed data.
 
 export type Movie = {
   id: string;
@@ -8,18 +10,37 @@ export type Movie = {
   /** Title in the original language, when it differs. */
   originalTitle?: string;
   year: number;
+  /** Director(s), comma-separated. */
   director: string;
-  /** Production countries as ISO 3166-1 alpha-2 codes, primary first. */
+  /** Countries the film is from (TMDB origin_country), main country first. */
+  origin: string[];
+  /**
+   * The film's main country: its first origin country that the map can show. The poster is pinned
+   * here and the film is listed as "From" it; every other producing country lists it as a
+   * co-production.
+   */
+  home: string;
+  /** Every production country, origin included, as ISO 3166-1 alpha-2 codes. */
   countries: string[];
-  /** Where the poster is pinned on the globe: a city tied to the film. */
+  /** Where the poster is pinned on the globe. */
   place: string;
   lat: number;
   lng: number;
-  /** Higher ranks stay visible when zoomed out and posters are capped. */
+  /** Higher ranks stay visible when zoomed out and posters are capped (TMDB: vote count). */
   rank: number;
+  /** TMDB poster path, e.g. "/abc.jpg"; absent or null means generated art. */
+  poster?: string | null;
+  genres?: string[];
+  runtime?: number | null;
+  /** TMDB average rating out of 10. */
+  rating?: number | null;
+  /** TMDB id, for "View on TMDB" links. */
+  tmdbId?: number;
 };
 
-export const MOCK_MOVIES: Movie[] = [
+type MockMovie = Omit<Movie, "origin" | "home"> & { origin?: string[] };
+
+const MOCK: MockMovie[] = [
   {
     id: "parasite",
     title: "Parasite",
@@ -256,3 +277,9 @@ export const MOCK_MOVIES: Movie[] = [
     rank: 4,
   },
 ];
+
+/** Each mock film is "from" its first production country. */
+export const MOCK_MOVIES: Movie[] = MOCK.map((m) => {
+  const origin = m.origin ?? [m.countries[0]];
+  return { ...m, origin, home: origin[0] };
+});

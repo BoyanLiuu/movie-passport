@@ -1,6 +1,7 @@
 // How many posters to show, and how big, for a given camera altitude.
 
 import type { Movie } from "@/data/movies";
+import { angularDistance } from "@/lib/geo/countries";
 
 /** On-screen poster width in CSS pixels: grows as the camera zooms in, within readable bounds. */
 export const posterWidth = (altitude: number) =>
@@ -24,16 +25,65 @@ export const posterLimit = (altitude: number) => {
 
 const byRank = (a: Movie, b: Movie) => b.rank - a.rank || a.id.localeCompare(b.id);
 
-/** The posters to render: top `limit` by rank, plus the selected film even if it ranks lower. */
-export const visiblePosters = (
+/** Degrees of arc from the view centre to the horizon, seen from `altitude` globe radii up. */
+export const horizonDegrees = (altitude: number) =>
+  (Math.acos(1 / (1 + Math.max(altitude, 0))) * 180) / Math.PI;
+
+export type PosterSelection = {
+  limit: number;
+  /** What the camera looks at; null skips the facing test (e.g. before the first frame). */
+  center: { lat: number; lng: number } | null;
+  altitude: number;
+  /** Always rendered, e.g. the selected film. */
+  always?: ReadonlySet<string>;
+  /** Spacing between pins relative to the default (smaller in country view, to show more). */
+  spacing?: number;
+};
+
+/**
+ * Minimum arc between two poster pins, like map labels: wide when zoomed out (about 11° at the
+ * global view), tight close up, so posters spread out instead of piling up over dense regions.
+ */
+export const posterSeparation = (altitude: number, scale = 4.5) =>
+  Math.min(14, Math.max(1, altitude * scale));
+
+/**
+ * The posters to render. Only films on the side of the globe facing the camera count towards the
+ * limit; countries take turns (every facing country's best film comes before any country's second);
+ * and a poster too close to a better-ranked one is skipped.
+ */
+export const selectPosters = (
   movies: Movie[],
-  limit: number,
-  selectedId: string | null = null,
+  { limit, center, altitude, always, spacing = 4.5 }: PosterSelection,
 ) => {
-  const ranked = [...movies].sort(byRank);
-  const shown = ranked.slice(0, limit);
-  const selected = selectedId ? ranked.find((m) => m.id === selectedId) : undefined;
-  return selected && !shown.includes(selected) ? [...shown, selected] : shown;
+  const horizon = horizonDegrees(altitude) - 4; // keep posters off the very edge
+  const facing = center
+    ? movies.filter((m) => angularDistance(center.lat, center.lng, m.lat, m.lng) <= horizon)
+    : movies;
+
+  const byCountry = new Map<string, Movie[]>();
+  for (const movie of [...facing].sort(byRank)) {
+    const key = movie.home;
+    const list = byCountry.get(key) ?? [];
+    list.push(movie);
+    byCountry.set(key, list);
+  }
+  const separation = posterSeparation(altitude, spacing);
+  const shown: Movie[] = [];
+  const tooClose = (m: Movie) =>
+    shown.some((s) => angularDistance(s.lat, s.lng, m.lat, m.lng) < separation);
+  for (let round = 0; shown.length < limit; round++) {
+    const tier = [...byCountry.values()].flatMap((list) => list[round] ?? []).sort(byRank);
+    if (tier.length === 0) break;
+    for (const movie of tier) {
+      if (shown.length >= limit) break;
+      if (!tooClose(movie)) shown.push(movie);
+    }
+  }
+
+  if (!always?.size) return shown;
+  const ids = new Set(shown.map((m) => m.id));
+  return [...shown, ...movies.filter((m) => always.has(m.id) && !ids.has(m.id))];
 };
 
 /** Deterministic pseudo-random numbers (mulberry32), so stress layouts are reproducible. */

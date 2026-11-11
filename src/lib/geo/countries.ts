@@ -49,6 +49,10 @@ export type Bounds = {
 export type Country = CountryProperties & {
   geometry: CountryGeometry;
   bounds: Bounds;
+  /** "place": a small territory or historical state drawn as a disc (src/lib/geo/places.ts). */
+  kind?: "place";
+  /** Shown under the name, e.g. "Historical state, 1922–1991". */
+  note?: string;
 };
 
 /**

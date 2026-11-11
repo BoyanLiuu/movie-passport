@@ -44,3 +44,11 @@ next-env.d.ts
 # playwright
 /test-results/
 /playwright-report/
+
+# The template is safe to commit; real values live in .env.local
+!.env.example
+
+# TMDB data: never committed (TMDB terms forbid redistribution); built by `pnpm data:catalogue`
+/public/data/catalogue.json
+/public/data/catalogue-overviews.json
+/public/data/*.tmp

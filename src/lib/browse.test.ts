@@ -7,6 +7,7 @@ import {
   filmCountLabel,
   filmsByCountry,
   nearestCountriesWithFilms,
+  splitByOrigin,
 } from "./catalogue";
 import { parseCountries, type Country } from "./geo/countries";
 import {
@@ -87,15 +88,24 @@ describe("navigation", () => {
 });
 
 describe("catalogue", () => {
-  it("lists a co-production under every producing country, oldest first", () => {
+  it("lists a co-production under every producing country, best-known first", () => {
     expect(films.get("FRA")?.map((f) => f.id)).toEqual(["amelie", "timbuktu"]);
-    expect(films.get("DEU")?.map((f) => f.id)).toEqual(["run-lola-run", "amelie"]);
+    expect(films.get("DEU")?.map((f) => f.id)).toEqual(["amelie", "run-lola-run"]);
     expect(films.get("USA")?.map((f) => f.id)).toEqual([
       "the-godfather",
       "crouching-tiger",
       "fellowship-of-the-ring",
     ]);
     expect(films.has("MLI")).toBe(false); // Timbuktu is set in Mali but not produced there
+  });
+
+  it("separates films from a country from those it only co-produced", () => {
+    const germany = splitByOrigin(films.get("DEU")!, "DE");
+    expect(germany.from.map((f) => f.id)).toEqual(["run-lola-run"]);
+    expect(germany.coProduced.map((f) => f.id)).toEqual(["amelie"]);
+    const usa = splitByOrigin(films.get("USA")!, "US");
+    expect(usa.from.map((f) => f.id)).toEqual(["the-godfather"]);
+    expect(usa.coProduced.map((f) => f.id)).toEqual(["crouching-tiger", "fellowship-of-the-ring"]);
   });
 
   it("summarises a country's films", () => {

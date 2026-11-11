@@ -137,10 +137,23 @@ lat, lng, rank }`. Real titles, but **generated** poster art (`src/lib/movies/po
 
 ### M4 — Real movie data (brief §8) — research first
 
-- Compare sources (TMDB, Wikidata, OMDb …) on licence, attribution, rate limits and poster rights. Write it up as a
-  decision record before writing code.
-- Define "country" = production country (brief's preference); co-productions belong to every listed country.
-- Prefer a build-time script that emits static JSON; add an API route or backend only when a feature needs it.
+- Source: **TMDB** ([decision 0002](decisions/0002-movie-data-source.md)); strictly non-commercial.
+- `scripts/fetch-catalogue.mjs` (pure transforms in `scripts/catalogue/tmdb.mjs`, unit-tested): for each map
+  country, the 10 most-voted films _from_ it (`with_origin_country`, ≥ 10 votes), then each film's details and
+  directors. Writes `public/data/catalogue.json` (~85 KB gzipped) and `catalogue-overviews.json` (plot summaries,
+  loaded on first use). Both gitignored; the token never leaves the build machine.
+- The app (`useCatalogue`, `src/lib/data/tmdbCatalogue.ts`) pins each film in its **main country** (first origin on
+  the map), on a sunflower spiral around the label point that stays on land; without a catalogue it uses the
+  20-film sample.
+- Country panels split **From {country}** (main country) and **Co-produced with**; film cards show runtime,
+  rating, genres, plot and a TMDB link; an About dialog carries the required attribution.
+- Poster selection (`selectPosters`): camera-facing only, countries take turns, minimum spacing by zoom; country
+  view draws only the country's own films (≤ 60).
+- Browser tests intercept the catalogue requests: the sample by default, a TMDB-shaped fixture where needed.
+- **Small places** (`src/data/places.json`, `src/lib/geo/places.ts`): 72 places without a 1:110m shape — Natural
+  Earth tiny-country points, three hand-entered, six historical states at their capitals — become disc-shaped
+  countries (radius ≤ 0.25°, shrunk near neighbours, wound like Natural Earth's rings). Old codes alias to
+  today's country (Burma → Myanmar, Zaire → DR Congo). The fetch also discovers these places' top 10.
 
 ### M5 — Polish & ship (optional)
 
@@ -172,19 +185,25 @@ Deploying is an outward-facing step and is done only with explicit sign-off.
 
 ## 7. Decisions log
 
-| #   | Decision                                                                                                                    | Milestone |
-| --- | --------------------------------------------------------------------------------------------------------------------------- | --------- |
-| 1   | Project name **Movie Passport** (`movie-passport`); renamed from Reel Atlas                                                 | M0        |
-| 2   | Stylised globe (dark material + country polygons), no photo texture                                                         | M1        |
-| 3   | Country id = Natural Earth `ADM0_A3`                                                                                        | M1        |
-| 4   | Reset zooms out above the current longitude                                                                                 | M1        |
-| 5   | Resolve clicks via `toGlobeCoords` + point-in-polygon, not `onPolygonClick` (its 50 ms throttled raycast misses quick taps) | M1        |
-| 6   | E2E: opt-in `NEXT_PUBLIC_GLOBE_TEST_HOOK` build in `.next-e2e/`; GPU (Metal) Chromium on macOS                              | M1        |
-| 7   | Playwright pinned to 1.64.1 to share browsers with `avatar-playground`                                                      | M1        |
-| 8   | Posters as HTML markers, max 60 rendered; sprites kept behind `?debug` (decision record 0001)                               | M2        |
-| 9   | Poster markers are click-through; the globe hit-tests them so drag/zoom work over posters                                   | M2        |
-| 10  | Movie mode highlights every production country; poster pinned at a city tied to the film                                    | M2        |
-| 11  | The URL is the source of truth for the selection (`?country=`, `?film=`); native pushState                                  | M3        |
-| 12  | Country param is ISO alpha-2 when it exists (shareable, readable), else Natural Earth id                                    | M3        |
-| 13  | Shift the globe (`globeOffset`) to keep the focus clear of panels, rather than re-aiming the camera                         | M3        |
-| 14  | `?debug=quiet` applies debug options without the panel (browser tests use it to turn posters off)                           | M3        |
+| #   | Decision                                                                                                                               | Milestone |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| 1   | Project name **Movie Passport** (`movie-passport`); renamed from Reel Atlas                                                            | M0        |
+| 2   | Stylised globe (dark material + country polygons), no photo texture                                                                    | M1        |
+| 3   | Country id = Natural Earth `ADM0_A3`                                                                                                   | M1        |
+| 4   | Reset zooms out above the current longitude                                                                                            | M1        |
+| 5   | Resolve clicks via `toGlobeCoords` + point-in-polygon, not `onPolygonClick` (its 50 ms throttled raycast misses quick taps)            | M1        |
+| 6   | E2E: opt-in `NEXT_PUBLIC_GLOBE_TEST_HOOK` build in `.next-e2e/`; GPU (Metal) Chromium on macOS                                         | M1        |
+| 7   | Playwright pinned to 1.64.1 to share browsers with `avatar-playground`                                                                 | M1        |
+| 8   | Posters as HTML markers, max 60 rendered; sprites kept behind `?debug` (decision record 0001)                                          | M2        |
+| 9   | Poster markers are click-through; the globe hit-tests them so drag/zoom work over posters                                              | M2        |
+| 10  | Movie mode highlights every production country; poster pinned at a city tied to the film                                               | M2        |
+| 11  | The URL is the source of truth for the selection (`?country=`, `?film=`); native pushState                                             | M3        |
+| 12  | Country param is ISO alpha-2 when it exists (shareable, readable), else Natural Earth id                                               | M3        |
+| 13  | Shift the globe (`globeOffset`) to keep the focus clear of panels, rather than re-aiming the camera                                    | M3        |
+| 14  | `?debug=quiet` applies debug options without the panel (browser tests use it to turn posters off)                                      | M3        |
+| 15  | TMDB as the data source, non-commercial; top 10 films per country; data built, never committed (decision 0002)                         | M4        |
+| 16  | "From" = a film's main country (first origin on the map); other origins count as co-producers                                          | M4        |
+| 17  | Posters: camera-facing, one per country first, spaced by zoom; country view shows only films from it                                   | M4        |
+| 18  | Tests intercept `/data/catalogue*.json` instead of a build flag, so one build covers sample and TMDB paths                             | M4        |
+| 19  | Places the map has no shape for become small disc-shaped countries (clickable, searchable, linkable), drawn only with films            | M4        |
+| 20  | Historical states (USSR, Yugoslavia…) get their own disc at their capital, labelled historical; renamed codes alias to today's country | M4        |

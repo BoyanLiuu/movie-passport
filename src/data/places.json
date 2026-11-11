@@ -1,0 +1,667 @@
+{
+  "source": "Natural Earth 1:50m admin-0 tiny countries (public domain), plus hand-entered places and historical states: scripts/prepare-places.mjs",
+  "aliases": {
+    "BU": "MM",
+    "TP": "TL",
+    "ZR": "CD",
+    "XI": "GB",
+    "GF": "FR",
+    "SJ": "NO"
+  },
+  "places": [
+    {
+      "iso2": "AD",
+      "id": "AND",
+      "name": "Andorra",
+      "formalName": "Principality of Andorra",
+      "continent": "Europe",
+      "lat": 42.537,
+      "lng": 1.548
+    },
+    {
+      "iso2": "AG",
+      "id": "ATG",
+      "name": "Antigua and Barb.",
+      "formalName": "Antigua and Barbuda",
+      "continent": "North America",
+      "lat": 17.073,
+      "lng": -61.786
+    },
+    {
+      "iso2": "AI",
+      "id": "AIA",
+      "name": "Anguilla",
+      "formalName": "Anguilla",
+      "continent": "North America",
+      "lat": 18.228,
+      "lng": -63.053
+    },
+    {
+      "iso2": "AN",
+      "id": "ANT",
+      "name": "Netherlands Antilles",
+      "formalName": "Netherlands Antilles",
+      "continent": "North America",
+      "lat": 12.6,
+      "lng": -68.4,
+      "note": "Historical, 1954–2010"
+    },
+    {
+      "iso2": "AS",
+      "id": "ASM",
+      "name": "American Samoa",
+      "formalName": "American Samoa",
+      "continent": "Oceania",
+      "lat": -14.31,
+      "lng": -170.728
+    },
+    {
+      "iso2": "AW",
+      "id": "ABW",
+      "name": "Aruba",
+      "formalName": "Aruba",
+      "continent": "North America",
+      "lat": 12.514,
+      "lng": -69.976
+    },
+    {
+      "iso2": "AX",
+      "id": "ALD",
+      "name": "Åland",
+      "formalName": "Åland Islands",
+      "continent": "Europe",
+      "lat": 60.234,
+      "lng": 19.997
+    },
+    {
+      "iso2": "BB",
+      "id": "BRB",
+      "name": "Barbados",
+      "formalName": "Barbados",
+      "continent": "North America",
+      "lat": 13.175,
+      "lng": -59.554
+    },
+    {
+      "iso2": "BH",
+      "id": "BHR",
+      "name": "Bahrain",
+      "formalName": "Kingdom of Bahrain",
+      "continent": "Asia",
+      "lat": 26.069,
+      "lng": 50.554
+    },
+    {
+      "iso2": "BL",
+      "id": "BLM",
+      "name": "St-Barthélemy",
+      "formalName": "Saint-Barthélemy",
+      "continent": "North America",
+      "lat": 17.9,
+      "lng": -62.844
+    },
+    {
+      "iso2": "BM",
+      "id": "BMU",
+      "name": "Bermuda",
+      "formalName": "The Bermudas or Somers Isles",
+      "continent": "North America",
+      "lat": 32.307,
+      "lng": -64.748
+    },
+    {
+      "iso2": "BQ",
+      "id": "NLY",
+      "name": "Caribbean Netherlands",
+      "formalName": "Bonaire, Sint Eustatius, and Saba",
+      "continent": "North America",
+      "lat": 12.183,
+      "lng": -68.252
+    },
+    {
+      "iso2": "CK",
+      "id": "COK",
+      "name": "Cook Is.",
+      "formalName": "Cook Is.",
+      "continent": "Oceania",
+      "lat": -21.22,
+      "lng": -159.789
+    },
+    {
+      "iso2": "CS",
+      "id": "SCG",
+      "name": "Serbia and Montenegro",
+      "formalName": "Serbia and Montenegro",
+      "continent": "Europe",
+      "lat": 44.2,
+      "lng": 20.9,
+      "note": "Historical state, 2003–2006"
+    },
+    {
+      "iso2": "CV",
+      "id": "CPV",
+      "name": "Cape Verde",
+      "formalName": "Republic of Cabo Verde",
+      "continent": "Africa",
+      "lat": 14.93,
+      "lng": -23.51
+    },
+    {
+      "iso2": "CW",
+      "id": "CUW",
+      "name": "Curaçao",
+      "formalName": "Curaçao",
+      "continent": "North America",
+      "lat": 12.122,
+      "lng": -68.853
+    },
+    {
+      "iso2": "DM",
+      "id": "DMA",
+      "name": "Dominica",
+      "formalName": "Commonwealth of Dominica",
+      "continent": "North America",
+      "lat": 15.432,
+      "lng": -61.354
+    },
+    {
+      "iso2": "FM",
+      "id": "FSM",
+      "name": "Micronesia",
+      "formalName": "Federated States of Micronesia",
+      "continent": "Oceania",
+      "lat": 6.886,
+      "lng": 158.242
+    },
+    {
+      "iso2": "FO",
+      "id": "FRO",
+      "name": "Faeroe Is.",
+      "formalName": "Føroyar Is. (Faeroe Is.)",
+      "continent": "Europe",
+      "lat": 62.192,
+      "lng": -6.943
+    },
+    {
+      "iso2": "GD",
+      "id": "GRD",
+      "name": "Grenada",
+      "formalName": "Grenada",
+      "continent": "North America",
+      "lat": 12.108,
+      "lng": -61.677
+    },
+    {
+      "iso2": "GG",
+      "id": "GGY",
+      "name": "Guernsey",
+      "formalName": "Bailiwick of Guernsey",
+      "continent": "Europe",
+      "lat": 49.46,
+      "lng": -2.569
+    },
+    {
+      "iso2": "GI",
+      "id": "GIB",
+      "name": "Gibraltar",
+      "formalName": "Gibraltar",
+      "continent": "Europe",
+      "lat": 36.128,
+      "lng": -5.369
+    },
+    {
+      "iso2": "GP",
+      "id": "GLP",
+      "name": "Guadeloupe",
+      "formalName": "Department of Guadeloupe",
+      "continent": "North America",
+      "lat": 16.18,
+      "lng": -61.666
+    },
+    {
+      "iso2": "GS",
+      "id": "SGS",
+      "name": "S. Geo. and the Is.",
+      "formalName": "South Georgia and the Islands",
+      "continent": "Seven seas (open ocean)",
+      "lat": -54.274,
+      "lng": -36.792
+    },
+    {
+      "iso2": "GU",
+      "id": "GUM",
+      "name": "Guam",
+      "formalName": "Territory of Guam",
+      "continent": "Oceania",
+      "lat": 13.46,
+      "lng": 144.77
+    },
+    {
+      "iso2": "HK",
+      "id": "HKG",
+      "name": "Hong Kong",
+      "formalName": "Hong Kong Special Administrative Region, PRC",
+      "continent": "Asia",
+      "lat": 22.437,
+      "lng": 114.108
+    },
+    {
+      "iso2": "IM",
+      "id": "IMN",
+      "name": "Isle of Man",
+      "formalName": "Isle of Man",
+      "continent": "Europe",
+      "lat": 54.207,
+      "lng": -4.531
+    },
+    {
+      "iso2": "IO",
+      "id": "IOT",
+      "name": "Br. Indian Ocean Ter.",
+      "formalName": "Br. Indian Ocean Ter.",
+      "continent": "Seven seas (open ocean)",
+      "lat": -7.341,
+      "lng": 72.479
+    },
+    {
+      "iso2": "JE",
+      "id": "JEY",
+      "name": "Jersey",
+      "formalName": "Bailiwick of Jersey",
+      "continent": "Europe",
+      "lat": 49.23,
+      "lng": -2.133
+    },
+    {
+      "iso2": "KI",
+      "id": "KIR",
+      "name": "Kiribati",
+      "formalName": "Republic of Kiribati",
+      "continent": "Oceania",
+      "lat": 1.364,
+      "lng": 173.135
+    },
+    {
+      "iso2": "KM",
+      "id": "COM",
+      "name": "Comoros",
+      "formalName": "Union of the Comoros",
+      "continent": "Africa",
+      "lat": -11.716,
+      "lng": 43.338
+    },
+    {
+      "iso2": "KN",
+      "id": "KNA",
+      "name": "St. Kitts and Nevis",
+      "formalName": "Federation of Saint Kitts and Nevis",
+      "continent": "North America",
+      "lat": 17.147,
+      "lng": -62.578
+    },
+    {
+      "iso2": "KY",
+      "id": "CYM",
+      "name": "Cayman Is.",
+      "formalName": "Cayman Islands",
+      "continent": "North America",
+      "lat": 19.326,
+      "lng": -81.266
+    },
+    {
+      "iso2": "LC",
+      "id": "LCA",
+      "name": "Saint Lucia",
+      "formalName": "Saint Lucia",
+      "continent": "North America",
+      "lat": 13.878,
+      "lng": -60.978
+    },
+    {
+      "iso2": "LI",
+      "id": "LIE",
+      "name": "Liechtenstein",
+      "formalName": "Principality of Liechtenstein",
+      "continent": "Europe",
+      "lat": 47.127,
+      "lng": 9.539
+    },
+    {
+      "iso2": "MC",
+      "id": "MCO",
+      "name": "Monaco",
+      "formalName": "Principality of Monaco",
+      "continent": "Europe",
+      "lat": 43.75,
+      "lng": 7.397
+    },
+    {
+      "iso2": "MF",
+      "id": "MAF",
+      "name": "St-Martin",
+      "formalName": "Saint-Martin (French part)",
+      "continent": "North America",
+      "lat": 18.071,
+      "lng": -63.06
+    },
+    {
+      "iso2": "MH",
+      "id": "MHL",
+      "name": "Marshall Is.",
+      "formalName": "Republic of the Marshall Islands",
+      "continent": "Oceania",
+      "lat": 7.313,
+      "lng": 168.729
+    },
+    {
+      "iso2": "MO",
+      "id": "MAC",
+      "name": "Macao",
+      "formalName": "Macao Special Administrative Region, PRC",
+      "continent": "Asia",
+      "lat": 22.154,
+      "lng": 113.55
+    },
+    {
+      "iso2": "MP",
+      "id": "MNP",
+      "name": "N. Mariana Is.",
+      "formalName": "Commonwealth of the Northern Mariana Islands",
+      "continent": "Oceania",
+      "lat": 15.175,
+      "lng": 145.739
+    },
+    {
+      "iso2": "MQ",
+      "id": "MTQ",
+      "name": "Martinique",
+      "formalName": "Department of Martinique",
+      "continent": "North America",
+      "lat": 14.685,
+      "lng": -61.03
+    },
+    {
+      "iso2": "MT",
+      "id": "MLT",
+      "name": "Malta",
+      "formalName": "Republic of Malta",
+      "continent": "Europe",
+      "lat": 35.882,
+      "lng": 14.438
+    },
+    {
+      "iso2": "MU",
+      "id": "MUS",
+      "name": "Mauritius",
+      "formalName": "Republic of Mauritius",
+      "continent": "Seven seas (open ocean)",
+      "lat": -20.302,
+      "lng": 57.586
+    },
+    {
+      "iso2": "MV",
+      "id": "MDV",
+      "name": "Maldives",
+      "formalName": "Republic of Maldives",
+      "continent": "Seven seas (open ocean)",
+      "lat": 4.187,
+      "lng": 73.502
+    },
+    {
+      "iso2": "NR",
+      "id": "NRU",
+      "name": "Nauru",
+      "formalName": "Republic of Nauru",
+      "continent": "Oceania",
+      "lat": -0.523,
+      "lng": 166.937
+    },
+    {
+      "iso2": "NU",
+      "id": "NIU",
+      "name": "Niue",
+      "formalName": "Niue",
+      "continent": "Oceania",
+      "lat": -19.055,
+      "lng": -169.87
+    },
+    {
+      "iso2": "PF",
+      "id": "PYF",
+      "name": "Fr. Polynesia",
+      "formalName": "French Polynesia",
+      "continent": "Oceania",
+      "lat": -17.625,
+      "lng": -149.475
+    },
+    {
+      "iso2": "PM",
+      "id": "SPM",
+      "name": "St. Pierre and Miquelon",
+      "formalName": "Saint Pierre and Miquelon",
+      "continent": "North America",
+      "lat": 46.857,
+      "lng": -56.316
+    },
+    {
+      "iso2": "PN",
+      "id": "PCN",
+      "name": "Pitcairn Is.",
+      "formalName": "Pitcairn, Henderson, Ducie and Oeno Islands",
+      "continent": "Oceania",
+      "lat": -24.364,
+      "lng": -128.318
+    },
+    {
+      "iso2": "PW",
+      "id": "PLW",
+      "name": "Palau",
+      "formalName": "Republic of Palau",
+      "continent": "Oceania",
+      "lat": 7.507,
+      "lng": 134.579
+    },
+    {
+      "iso2": "RE",
+      "id": "REU",
+      "name": "Réunion",
+      "formalName": "Réunion",
+      "continent": "Africa",
+      "lat": -21.11,
+      "lng": 55.53
+    },
+    {
+      "iso2": "SC",
+      "id": "SYC",
+      "name": "Seychelles",
+      "formalName": "Republic of Seychelles",
+      "continent": "Seven seas (open ocean)",
+      "lat": -9.402,
+      "lng": 46.442
+    },
+    {
+      "iso2": "SG",
+      "id": "SGP",
+      "name": "Singapore",
+      "formalName": "Republic of Singapore",
+      "continent": "Asia",
+      "lat": 1.359,
+      "lng": 103.815
+    },
+    {
+      "iso2": "SH",
+      "id": "SHN",
+      "name": "Saint Helena",
+      "formalName": "Saint Helena",
+      "continent": "Seven seas (open ocean)",
+      "lat": -15.963,
+      "lng": -5.716
+    },
+    {
+      "iso2": "SM",
+      "id": "SMR",
+      "name": "San Marino",
+      "formalName": "Republic of San Marino",
+      "continent": "Europe",
+      "lat": 43.941,
+      "lng": 12.459
+    },
+    {
+      "iso2": "ST",
+      "id": "STP",
+      "name": "São Tomé and Principe",
+      "formalName": "Democratic Republic of São Tomé and Principe",
+      "continent": "Africa",
+      "lat": 0.247,
+      "lng": 6.617
+    },
+    {
+      "iso2": "SU",
+      "id": "SUN",
+      "name": "Soviet Union",
+      "formalName": "Union of Soviet Socialist Republics",
+      "continent": "Europe",
+      "lat": 55.75,
+      "lng": 37.62,
+      "note": "Historical state, 1922–1991"
+    },
+    {
+      "iso2": "SX",
+      "id": "SXM",
+      "name": "Sint Maarten",
+      "formalName": "Sint Maarten (Dutch part)",
+      "continent": "North America",
+      "lat": 18.008,
+      "lng": -63.081
+    },
+    {
+      "iso2": "TC",
+      "id": "TCA",
+      "name": "Turks and Caicos Is.",
+      "formalName": "Turks and Caicos Islands",
+      "continent": "North America",
+      "lat": 21.913,
+      "lng": -71.954
+    },
+    {
+      "iso2": "TK",
+      "id": "TKL",
+      "name": "Tokelau",
+      "formalName": "Tokelau",
+      "continent": "Oceania",
+      "lat": -8.565,
+      "lng": -172.485
+    },
+    {
+      "iso2": "TO",
+      "id": "TON",
+      "name": "Tonga",
+      "formalName": "Kingdom of Tonga",
+      "continent": "Oceania",
+      "lat": -21.158,
+      "lng": -175.235
+    },
+    {
+      "iso2": "TV",
+      "id": "TUV",
+      "name": "Tuvalu",
+      "formalName": "Tuvalu",
+      "continent": "Oceania",
+      "lat": -8.5,
+      "lng": 179.204
+    },
+    {
+      "iso2": "VA",
+      "id": "VAT",
+      "name": "Vatican",
+      "formalName": "State of the Vatican City",
+      "continent": "Europe",
+      "lat": 41.901,
+      "lng": 12.45
+    },
+    {
+      "iso2": "VC",
+      "id": "VCT",
+      "name": "St. Vin. and Gren.",
+      "formalName": "Saint Vincent and the Grenadines",
+      "continent": "North America",
+      "lat": 13.232,
+      "lng": -61.202
+    },
+    {
+      "iso2": "VG",
+      "id": "VGB",
+      "name": "British Virgin Is.",
+      "formalName": "British Virgin Islands",
+      "continent": "North America",
+      "lat": 18.49,
+      "lng": -64.399
+    },
+    {
+      "iso2": "VI",
+      "id": "VIR",
+      "name": "U.S. Virgin Is.",
+      "formalName": "Virgin Islands of the United States",
+      "continent": "North America",
+      "lat": 18.349,
+      "lng": -64.912
+    },
+    {
+      "iso2": "WF",
+      "id": "WLF",
+      "name": "Wallis and Futuna Is.",
+      "formalName": "Wallis and Futuna Islands",
+      "continent": "Oceania",
+      "lat": -13.28,
+      "lng": -176.164
+    },
+    {
+      "iso2": "WS",
+      "id": "WSM",
+      "name": "Samoa",
+      "formalName": "Independent State of Samoa",
+      "continent": "Oceania",
+      "lat": -13.637,
+      "lng": -172.414
+    },
+    {
+      "iso2": "XC",
+      "id": "CSK",
+      "name": "Czechoslovakia",
+      "formalName": "Czechoslovakia",
+      "continent": "Europe",
+      "lat": 50.08,
+      "lng": 14.44,
+      "note": "Historical state, 1918–1992"
+    },
+    {
+      "iso2": "XG",
+      "id": "DDR",
+      "name": "East Germany",
+      "formalName": "German Democratic Republic",
+      "continent": "Europe",
+      "lat": 52.52,
+      "lng": 13.4,
+      "note": "Historical state, 1949–1990"
+    },
+    {
+      "iso2": "YT",
+      "id": "MYT",
+      "name": "Mayotte",
+      "formalName": "Mayotte",
+      "continent": "Africa",
+      "lat": -12.82,
+      "lng": 45.15
+    },
+    {
+      "iso2": "YU",
+      "id": "YUG",
+      "name": "Yugoslavia",
+      "formalName": "Yugoslavia",
+      "continent": "Europe",
+      "lat": 44.82,
+      "lng": 20.46,
+      "note": "Historical state, 1918–1992"
+    }
+  ]
+}

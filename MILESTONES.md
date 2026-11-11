@@ -3,18 +3,18 @@
 How to read this: `[x]` done and verified, `[ ]` not yet. Each milestone is done when every box is ticked and
 `pnpm check` passes. Details and rationale live in [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md).
 
-| Milestone                      | Status         | Demo                                                     |
-| ------------------------------ | -------------- | -------------------------------------------------------- |
-| M0 — Foundation                | ✅ Done        | `pnpm dev` serves the app on http://127.0.0.1:3002       |
-| M1 — Interactive Earth         | ✅ Done        | Rotate, hover and click countries; camera focuses; reset |
-| M2 — Placeholder movie posters | ✅ Done        | 20 generated posters; click one to open the film         |
-| M3 — Mode A ↔ B                | ✅ Done        | Country view lists its films; URL sync; search           |
-| M4 — Real movie data           | ⚪ Next        | Licensed metadata from a chosen source                   |
-| M5 — Polish & ship (optional)  | ⚪ Not started | Deployed site, a11y and performance budgets met          |
+| Milestone                      | Status  | Demo                                                     |
+| ------------------------------ | ------- | -------------------------------------------------------- |
+| M0 — Foundation                | ✅ Done | `pnpm dev` serves the app on http://127.0.0.1:3002       |
+| M1 — Interactive Earth         | ✅ Done | Rotate, hover and click countries; camera focuses; reset |
+| M2 — Placeholder movie posters | ✅ Done | 20 generated posters; click one to open the film         |
+| M3 — Mode A ↔ B                | ✅ Done | Country view lists its films; URL sync; search           |
+| M4 — Real movie data           | ✅ Done | 1,171 real films from TMDB, incl. Hong Kong, USSR…       |
+| M5 — Polish & ship (optional)  | ⚪ Next | Deployed site, a11y and performance budgets met          |
 
-**Last verified:** 2026-11-11 — `pnpm check` green (lint, typecheck, 64 unit tests, build);
-`pnpm test:e2e` 78 passed, 6 skipped (mouse-only tests on the phone project), desktop Chrome + Pixel 7
-emulation, stable over 2 repeats.
+**Last verified:** 2026-11-11 — `pnpm check` green (lint, typecheck, 92 unit tests, build);
+`pnpm test:e2e` 94 passed, 6 skipped (mouse-only tests on the phone project), desktop Chrome + Pixel 7
+emulation. The TMDB token appears in no build output, no public file and no tracked file.
 
 ---
 
@@ -101,13 +101,31 @@ Worth a manual look:
 
 - [ ] Search and the country list on a real phone (the sheet covers half the screen for big lists)
 
-## M4 — Real movie data
+## M4 — Real movie data ✅
 
-- [ ] Source comparison (licence, attribution, limits, poster rights) as a decision record
-- [ ] Definition of "country" and co-production handling settled
-- [ ] Build-time data script producing static JSON
-- [ ] Attribution shown in the app
-- [ ] API route / backend only if a feature requires it
+- [x] Source comparison (licence, attribution, limits, poster rights) as a decision record:
+      [`docs/decisions/0002-movie-data-source.md`](docs/decisions/0002-movie-data-source.md) — TMDB
+- [x] Definition of "country" and co-production handling settled: a film is listed in every
+      producing country; "From" = its main country (first origin on the map), where its poster is
+      pinned; everyone else lists it as a co-production
+- [x] Build-time data script producing static JSON: `pnpm data:catalogue` (top 10 per country,
+      ~1,171 films incl. small places and historical states, ~30 s); output gitignored, never
+      committed (TMDB terms)
+- [x] Token handled securely: `.env.local` only (gitignored, mode 600), build script only, verified
+      absent from builds and the repo
+- [x] Attribution shown in the app: About & credits dialog (TMDB logo + notice), "View on TMDB" links
+- [x] API route / backend only if a feature requires it — none needed: static files
+- [x] Real posters from TMDB's image CDN, generated art as fallback; plot summaries load on demand
+- [x] Posters chosen from the side facing the camera, one per country first, spaced like map labels
+      (the follow-up from decision 0001)
+- [x] Clickable discs for places the 1:110m map has no shape for: 72 places (Natural Earth tiny
+      countries, a few hand-entered, and historical states like the Soviet Union, Yugoslavia,
+      Czechoslovakia at their capitals); drawn only when they have films (35 do); old codes (Burma,
+      Zaire…) count as today's country. `src/data/places.json`, built by `pnpm data:places`
+
+Worth a manual look:
+
+- [ ] Real data on your screen: `pnpm data:catalogue`, then `pnpm dev`
 
 ## M5 — Polish & ship (optional)
 

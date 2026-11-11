@@ -12,8 +12,8 @@ import { baseMovieId } from "@/lib/movies/posters";
 
 const urlCache = new Map<string, string>();
 
-/** Poster image URL, generated once per film (stress-test copies share their base film's art). */
-export const posterUrl = (movie: Movie) => {
+/** Generated placeholder art, built once per film (stress-test copies share their base's art). */
+export const generatedPosterUrl = (movie: Movie) => {
   const id = baseMovieId(movie.id);
   let url = urlCache.get(id);
   if (!url) {
@@ -21,6 +21,20 @@ export const posterUrl = (movie: Movie) => {
     urlCache.set(id, url);
   }
   return url;
+};
+
+/** TMDB image CDN. Sizes: w92 (list thumbnails), w185 (globe markers), w342 (film card). */
+const TMDB_IMAGES = "https://image.tmdb.org/t/p";
+export type PosterSize = "w92" | "w185" | "w342";
+
+/** The film's TMDB poster when it has one, otherwise generated art. */
+export const posterUrl = (movie: Movie, size: PosterSize = "w185") =>
+  movie.poster ? `${TMDB_IMAGES}/${size}${movie.poster}` : generatedPosterUrl(movie);
+
+/** For <img onError>: swap a failed TMDB poster for generated art, once. */
+export const fallBackToGeneratedArt = (image: HTMLImageElement, movie: Movie) => {
+  const fallback = generatedPosterUrl(movie);
+  if (image.src !== fallback) image.src = fallback;
 };
 
 export const createPosterElement = (movie: Movie, onActivate: (movieId: string) => void) => {
@@ -37,6 +51,7 @@ export const createPosterElement = (movie: Movie, onActivate: (movieId: string) 
 
   const image = document.createElement("img");
   image.src = posterUrl(movie);
+  image.addEventListener("error", () => fallBackToGeneratedArt(image, movie), { once: true });
   image.alt = "";
   image.draggable = false;
   image.decoding = "async";

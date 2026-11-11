@@ -24,7 +24,7 @@ export const globeTheme = {
   strokeSelected: "rgba(254, 240, 138, 0.95)",
 
   /** Polygon lift in globe radii: selected and hovered countries rise off the surface. */
-  altitude: { base: 0.006, hover: 0.018, selected: 0.032 },
+  altitude: { base: 0.006, hover: 0.018, selected: 0.032, place: 0.016 },
   polygonTransitionMs: 260,
 
   autoRotateSpeed: 0.35,

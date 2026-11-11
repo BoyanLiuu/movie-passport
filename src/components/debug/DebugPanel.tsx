@@ -24,7 +24,7 @@ export const DebugPanel = ({ options, posterCount }: DebugPanelProps) => {
   return (
     <aside
       aria-label="Debug panel"
-      className="pointer-events-auto absolute top-40 left-3 w-56 rounded-xl border border-white/10 bg-slate-950/85 p-3 font-mono text-[11px] text-slate-300 backdrop-blur sm:top-auto sm:bottom-3"
+      className="pointer-events-auto absolute top-44 left-3 w-56 rounded-xl border border-white/10 bg-slate-950/85 p-3 font-mono text-[11px] text-slate-300 backdrop-blur sm:top-auto sm:bottom-3"
     >
       <p className="flex items-baseline justify-between">
         <span className="text-slate-500">FPS</span>

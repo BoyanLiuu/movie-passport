@@ -23,22 +23,47 @@ export const country = (id: string): Country => {
   return found;
 };
 
-/** Collects console errors and uncaught exceptions for the whole test. */
-export const trackErrors = (page: Page) => {
+/**
+ * Collects console errors and uncaught exceptions for the whole test. Failed requests for URLs in
+ * `expectedFailures` don't count: the catalogue files 404 on purpose when a test runs without one,
+ * and some tests block the poster CDN.
+ */
+export const trackErrors = (
+  page: Page,
+  expectedFailures: RegExp[] = [/\/data\/catalogue(-overviews)?\.json$/],
+) => {
   const errors: string[] = [];
   page.on("console", (msg) => {
-    if (msg.type() === "error") errors.push(msg.text());
+    if (msg.type() !== "error") return;
+    const url = msg.location().url ?? "";
+    if (expectedFailures.some((pattern) => pattern.test(url))) return;
+    errors.push(msg.text());
   });
   page.on("pageerror", (error) => errors.push(error.message));
   return errors;
 };
 
-type OpenOptions = { reducedMotion?: boolean; posters?: boolean; query?: string };
+type OpenOptions = {
+  reducedMotion?: boolean;
+  posters?: boolean;
+  query?: string;
+  /**
+   * The TMDB catalogue the page receives. By default none (404), so the app shows the fixed
+   * 20-film sample whatever catalogue file exists locally; pass a fixture to test the TMDB path.
+   */
+  catalogue?: { catalogue: unknown; overviews?: Record<string, string> };
+};
 
 export const openGlobe = async (
   page: Page,
-  { reducedMotion = true, posters = true, query = "" }: OpenOptions = {},
+  { reducedMotion = true, posters = true, query = "", catalogue }: OpenOptions = {},
 ) => {
+  await page.route("**/data/catalogue.json", (route) =>
+    catalogue ? route.fulfill({ json: catalogue.catalogue }) : route.fulfill({ status: 404 }),
+  );
+  await page.route("**/data/catalogue-overviews.json", (route) =>
+    catalogue ? route.fulfill({ json: catalogue.overviews ?? {} }) : route.fulfill({ status: 404 }),
+  );
   // Reduced motion makes camera moves instant and turns off auto-rotation: deterministic tests.
   await page.emulateMedia({ reducedMotion: reducedMotion ? "reduce" : "no-preference" });
   // Country tests turn posters off: a poster correctly wins a click over the country beneath it.

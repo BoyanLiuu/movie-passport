@@ -17,9 +17,12 @@ import {
 import type { Movie } from "@/data/movies";
 import { POSTER_HEIGHT, POSTER_WIDTH } from "@/lib/movies/poster";
 import { baseMovieId } from "@/lib/movies/posters";
-import { posterUrl } from "./htmlPosters";
+import { generatedPosterUrl } from "./htmlPosters";
 
-/** SVG -> canvas at 2x -> texture. The SVG is a data URL, so the canvas is never tainted. */
+/**
+ * SVG -> canvas at 2x -> texture. Always the generated art: it is a data URL, so the canvas is never
+ * tainted, and the spike doesn't depend on TMDB's CDN sending CORS headers.
+ */
 const posterTexture = (movie: Movie) => {
   const canvas = document.createElement("canvas");
   canvas.width = POSTER_WIDTH * 2;
@@ -31,7 +34,7 @@ const posterTexture = (movie: Movie) => {
     canvas.getContext("2d")?.drawImage(image, 0, 0, canvas.width, canvas.height);
     texture.needsUpdate = true;
   };
-  image.src = posterUrl(movie);
+  image.src = generatedPosterUrl(movie);
   return texture;
 };
 

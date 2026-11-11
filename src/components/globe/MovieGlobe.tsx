@@ -5,14 +5,22 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { DebugPanel } from "@/components/debug/DebugPanel";
 import { SearchBox } from "@/components/search/SearchBox";
 import { MOCK_MOVIES, type Movie } from "@/data/movies";
+import { AboutDialog } from "@/components/AboutDialog";
+import { useCatalogue, useOverview } from "@/hooks/useCatalogue";
 import { useCountries } from "@/hooks/useCountries";
 import { usePanelOffset } from "@/hooks/usePanelOffset";
 import { usePrefersReducedMotion } from "@/hooks/usePrefersReducedMotion";
 import { navigateToSearch, useSearchString } from "@/hooks/useSearchParams";
-import { countryStats, filmsByCountry, nearestCountriesWithFilms } from "@/lib/catalogue";
+import {
+  countryStats,
+  filmsByCountry,
+  nearestCountriesWithFilms,
+  splitByOrigin,
+} from "@/lib/catalogue";
 import { parseDebugOptions } from "@/lib/debug";
 import { type FocusTarget, focusView, movieView } from "@/lib/geo/camera";
 import type { Country } from "@/lib/geo/countries";
+import { PLACE_COUNTRIES } from "@/lib/geo/places";
 import {
   GLOBAL_MODE,
   type GlobeMode,
@@ -52,10 +60,29 @@ export const MovieGlobe = () => {
   const [topOverlay, setTopOverlay] = useState<HTMLElement | null>(null);
   const viewOffset = usePanelOffset(panel, topOverlay);
 
-  const countries = useMemo(() => (state.status === "ready" ? state.countries : []), [state]);
+  // Small places (Hong Kong, Malta, the Soviet Union…) come first: where a disc sits on a bigger
+  // shape, the disc wins the click and is the film's home.
+  const pinnable = useMemo(
+    () => (state.status === "ready" ? [...PLACE_COUNTRIES, ...state.countries] : null),
+    [state],
+  );
+  const catalogue = useCatalogue(pinnable);
+  const ready = state.status === "ready" && catalogue.status === "ready";
+  // The real (or sample) catalogue: decides which countries have films, and what search finds.
+  const catalogueMovies = catalogue.status === "ready" ? catalogue.movies : EMPTY_FILMS;
+  // Every map country, plus the small places that actually have films (no empty dots).
+  const countries = useMemo(() => {
+    if (state.status !== "ready") return [];
+    const used = new Set(catalogueMovies.flatMap((m) => m.countries));
+    return [...PLACE_COUNTRIES.filter((p) => p.iso2 && used.has(p.iso2)), ...state.countries];
+  }, [state, catalogueMovies]);
+  // What the globe draws: the catalogue, or stress-test copies of it from the debug panel.
   const movies = useMemo(
-    () => (debug.posters === null ? MOCK_MOVIES : stressPosters(MOCK_MOVIES, debug.posters)),
-    [debug.posters],
+    () =>
+      debug.posters === null
+        ? catalogueMovies
+        : stressPosters(catalogueMovies.length ? catalogueMovies : MOCK_MOVIES, debug.posters),
+    [debug.posters, catalogueMovies],
   );
   const movieIds = useMemo(() => new Set(movies.map((m) => m.id)), [movies]);
   const countryByIso2 = useMemo(
@@ -67,19 +94,21 @@ export const MovieGlobe = () => {
     [countryByIso2],
   );
   // The catalogue's films, not stress-test copies, decide which countries "have films".
-  const films = useMemo(() => filmsByCountry(MOCK_MOVIES, countries), [countries]);
+  const films = useMemo(
+    () => filmsByCountry(catalogueMovies, countries),
+    [catalogueMovies, countries],
+  );
   const filmCounts = useMemo(
     () => new Map([...films].map(([id, list]) => [id, list.length])),
     [films],
   );
 
-  // The URL is the source of truth for what is selected; until the map has loaded, show the globe.
+  // The URL is the source of truth for what is selected; until the map and the films have loaded,
+  // show the globe (so a deep link isn't reported as "not found" while the catalogue loads).
   const { mode, notFound } = useMemo(
     () =>
-      state.status === "ready"
-        ? modeFromSearch(search, countries, movieIds)
-        : { mode: GLOBAL_MODE, notFound: null },
-    [state.status, search, countries, movieIds],
+      ready ? modeFromSearch(search, countries, movieIds) : { mode: GLOBAL_MODE, notFound: null },
+    [ready, search, countries, movieIds],
   );
   const go = useCallback(
     (next: GlobeMode) => navigateToSearch(searchForMode(next, window.location.search, countries)),
@@ -99,13 +128,31 @@ export const MovieGlobe = () => {
     () => (selectedMovie?.countries ?? []).flatMap((code) => countryByIso2.get(code) ?? []),
     [selectedMovie, countryByIso2],
   );
+  const movieFrom = useMemo(
+    () => movieCountries.filter((c) => c.iso2 && selectedMovie?.origin.includes(c.iso2)),
+    [movieCountries, selectedMovie],
+  );
+  const movieCoProduced = useMemo(
+    () => movieCountries.filter((c) => !movieFrom.includes(c)),
+    [movieCountries, movieFrom],
+  );
+  const overview = useOverview(
+    selectedMovie?.id ?? null,
+    catalogue.status === "ready" && catalogue.source === "tmdb",
+  );
   const countryFilms = selectedCountry ? (films.get(selectedCountry.id) ?? EMPTY_FILMS) : null;
+  const countrySplit = useMemo(
+    () => (countryFilms ? splitByOrigin(countryFilms, selectedCountry?.iso2 ?? null) : null),
+    [countryFilms, selectedCountry],
+  );
 
   const highlightedIds = useMemo(
     () => (selectedCountry ? [selectedCountry.id] : movieCountries.map((c) => c.id)),
     [selectedCountry, movieCountries],
   );
-  const focusMovieIds = useMemo(() => countryFilms?.map((f) => f.id) ?? null, [countryFilms]);
+  // Country view keeps posters only for films *from* the country: co-productions are pinned in
+  // their own home countries, so drawing them would scatter posters across the region.
+  const focusMovieIds = useMemo(() => countrySplit?.from.map((f) => f.id) ?? null, [countrySplit]);
   const focus = useMemo<FocusTarget | null>(() => {
     if (selectedCountry) {
       return { key: `country:${selectedCountry.id}`, view: (a) => focusView(selectedCountry, a) };
@@ -190,16 +237,23 @@ export const MovieGlobe = () => {
         <header className="absolute top-5 left-5 sm:top-6 sm:left-6">
           <h1 className="font-display text-3xl text-slate-50 sm:text-4xl">Movie Passport</h1>
           <p className="mt-1 text-sm text-slate-400">Travel the world through films.</p>
+          {catalogue.status === "ready" && (
+            <AboutDialog
+              source={catalogue.source}
+              generatedAt={catalogue.generatedAt}
+              filmCount={catalogue.movies.length}
+            />
+          )}
         </header>
 
         {state.status === "ready" && (
           <div
             ref={setTopOverlay}
-            className="absolute inset-x-3 top-24 sm:inset-x-auto sm:left-6 sm:w-96 lg:top-6 lg:left-1/2 lg:-translate-x-1/2"
+            className="absolute inset-x-3 top-28 sm:inset-x-auto sm:top-32 sm:left-6 sm:w-96 lg:top-6 lg:left-1/2 lg:-translate-x-1/2"
           >
             <SearchBox
               countries={countries}
-              movies={MOCK_MOVIES}
+              movies={catalogueMovies}
               filmCounts={filmCounts}
               countryNames={countryNames}
               onSelectCountry={(id) => {
@@ -233,12 +287,13 @@ export const MovieGlobe = () => {
           </div>
         )}
 
-        {selectedCountry && countryFilms && (
+        {selectedCountry && countryFilms && countrySplit && (
           <CountryInfo
             key={selectedCountry.id}
             ref={setPanel}
             country={selectedCountry}
-            films={countryFilms}
+            from={countrySplit.from}
+            coProduced={countrySplit.coProduced}
             stats={countryStats(countryFilms)}
             nearby={
               countryFilms.length === 0
@@ -257,7 +312,9 @@ export const MovieGlobe = () => {
             key={selectedMovie.id}
             ref={setPanel}
             movie={selectedMovie}
-            countries={movieCountries}
+            from={movieFrom}
+            coProduced={movieCoProduced}
+            overview={overview}
             onSelectCountry={selectCountry}
             onReset={reset}
           />

@@ -29,6 +29,8 @@ pnpm dev                 # http://127.0.0.1:3002
 | `pnpm test:e2e`       | Browser tests (Playwright): builds to `.next-e2e/` and serves it on :3202 |
 | `pnpm format`         | Prettier with Tailwind class sorting (`format:check` to verify)           |
 | `pnpm data:countries` | Rebuilds `public/data/countries-110m.geojson` from Natural Earth          |
+| `pnpm data:catalogue` | Fetches the TMDB film catalogue into `public/data/` (needs `.env.local`)  |
+| `pnpm data:places`    | Rebuilds `src/data/places.json` (small places and historical states)      |
 
 The first `pnpm test:e2e` needs a Playwright browser: `pnpm exec playwright install chromium`.
 
@@ -73,8 +75,21 @@ to software WebGL, which is slower.
 ## Data
 
 Country boundaries: [Natural Earth](https://www.naturalearthdata.com/) 1:110m Admin 0 – Countries,
-public domain. Films are a hand-entered mock list of 20 (`src/data/movies.ts`); poster art is
-generated, not the studios' posters. Real data comes in M4.
+public domain.
+
+Films come from [TMDB](https://www.themoviedb.org/) (non-commercial use, with attribution in the
+app's About dialog). The data is **fetched at build time and never committed** — TMDB's terms forbid
+redistributing it:
+
+1. Get a free API Read Access Token at <https://www.themoviedb.org/settings/api>.
+2. `cp .env.example .env.local` and set `TMDB_READ_TOKEN`. `.env.local` is gitignored; the token is
+   only read by the fetch script and never reaches the browser.
+3. `pnpm data:catalogue` — the 10 most-voted films from each country (~1,050 films, ~30 s), written
+   to `public/data/` (gitignored). Re-run monthly: TMDB allows caching for at most 6 months.
+
+Without a catalogue the app shows a hand-picked sample of 20 films with generated poster art
+(`src/data/movies.ts`); the browser tests always use that sample. See
+[`docs/decisions/0002-movie-data-source.md`](docs/decisions/0002-movie-data-source.md).
 
 ## Debug panel
 

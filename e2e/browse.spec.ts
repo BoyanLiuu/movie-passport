@@ -19,9 +19,9 @@ test.describe("country view", () => {
     await expect(panel(page)).toHaveText("France");
 
     const stats = page.getByTestId("country-stats");
-    await expect(stats).toContainText("Films2");
+    await expect(stats).toContainText("From here2");
+    await expect(stats).toContainText("Co-produced0");
     await expect(stats).toContainText("2000s–2010s");
-    await expect(stats).toContainText("Co-prod.2");
 
     const items = filmList(page, "France").getByRole("button");
     await expect(items).toHaveCount(2);
@@ -38,7 +38,9 @@ test.describe("country view", () => {
 
     await page.keyboard.press("Escape");
     await expect(mode(page)).toHaveAttribute("data-mode", "global");
-    await expect.poll(async () => (await activePosterIds(page)).length).toBe(12);
+    // The global set comes back: more than France's two, at most a dozen.
+    await expect.poll(async () => (await activePosterIds(page)).length).toBeGreaterThan(2);
+    expect((await activePosterIds(page)).length).toBeLessThanOrEqual(12);
   });
 
   test("opens a film from the list", async ({ page }) => {
@@ -58,7 +60,10 @@ test.describe("country view", () => {
     await expect(empty).toContainText("No films from Mali in the catalogue yet.");
     await empty.getByRole("button").first().click();
     await expect(panel(page)).toHaveText("Mauritania");
-    await expect(filmList(page, "Mauritania")).toContainText("Timbuktu");
+    // Timbuktu is from France; Mauritania co-produced it.
+    await expect(page.getByRole("list", { name: "Co-productions with Mauritania" })).toContainText(
+      "Timbuktu",
+    );
   });
 });
 
