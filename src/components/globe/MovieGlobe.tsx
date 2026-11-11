@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DebugPanel } from "@/components/debug/DebugPanel";
 import { SearchBox } from "@/components/search/SearchBox";
 import { MOCK_MOVIES, type Movie } from "@/data/movies";
@@ -29,6 +29,7 @@ import {
   searchWithoutSelection,
 } from "@/lib/navigation";
 import { stressPosters } from "@/lib/movies/posters";
+import { FilmDetailsSheet } from "@/components/details/FilmDetailsSheet";
 import { CountryInfo } from "./CountryInfo";
 import { GlobeErrorBoundary } from "./GlobeErrorBoundary";
 import { GlobeStatus } from "./GlobeStatus";
@@ -168,6 +169,50 @@ export const MovieGlobe = () => {
     [go],
   );
   const selectMovie = useCallback((movieId: string) => go({ kind: "movie", movieId }), [go]);
+
+  // The details sheet is part of the URL (`&details`). Opened from the app it pushes a history
+  // entry, so closing goes back to it; opened from a shared link, closing replaces the URL instead
+  // (going back would leave the site).
+  const detailsPushed = useRef(false);
+  const detailsOpen = mode.kind === "movie" && !!mode.details && !!selectedMovie?.tmdbId;
+  useEffect(() => {
+    if (!detailsOpen) detailsPushed.current = false;
+  }, [detailsOpen]);
+  const openDetails = useCallback(
+    (movieId: string) => {
+      detailsPushed.current = true;
+      go({ kind: "movie", movieId, details: true });
+    },
+    [go],
+  );
+  const closeDetails = useCallback(() => {
+    if (detailsPushed.current) {
+      detailsPushed.current = false;
+      window.history.back();
+    } else if (selectedMovie) {
+      navigateToSearch(
+        searchForMode(
+          { kind: "movie", movieId: selectedMovie.id },
+          window.location.search,
+          countries,
+        ),
+        { replace: true },
+      );
+    }
+    requestAnimationFrame(() =>
+      document.querySelector<HTMLElement>("[data-more-details]")?.focus(),
+    );
+  }, [selectedMovie, countries]);
+  const moreFromHome = useMemo(
+    () =>
+      selectedMovie
+        ? catalogueMovies
+            .filter((m) => m.home === selectedMovie.home && m.id !== selectedMovie.id)
+            .slice(0, 10)
+        : EMPTY_FILMS,
+    [selectedMovie, catalogueMovies],
+  );
+  const catalogueIds = useMemo(() => new Set(catalogueMovies.map((m) => m.id)), [catalogueMovies]);
   const reset = useCallback(() => go(GLOBAL_MODE), [go]);
   const dismissNotFound = useCallback(
     () => navigateToSearch(searchWithoutSelection(window.location.search), { replace: true }),
@@ -176,8 +221,10 @@ export const MovieGlobe = () => {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      // The search box handles (and prevents) its own Escape.
-      if (event.key === "Escape" && !event.defaultPrevented) reset();
+      // The search box handles (and prevents) its own Escape; an open dialog handles its own too.
+      if (event.key !== "Escape" || event.defaultPrevented) return;
+      if (document.querySelector("dialog[open]")) return;
+      reset();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
@@ -224,6 +271,7 @@ export const MovieGlobe = () => {
             posterRenderer={debug.renderer}
             capPosters={debug.cap}
             autoRotate={mode.kind === "global"}
+            paused={detailsOpen}
             reducedMotion={reducedMotion}
             onHover={setHoveredId}
             onSelectCountry={selectCountry}
@@ -315,6 +363,7 @@ export const MovieGlobe = () => {
             from={movieFrom}
             coProduced={movieCoProduced}
             overview={overview}
+            onOpenDetails={selectedMovie.tmdbId ? () => openDetails(selectedMovie.id) : undefined}
             onSelectCountry={selectCountry}
             onReset={reset}
           />
@@ -329,6 +378,21 @@ export const MovieGlobe = () => {
             </span>
             <span className="mt-1 block text-slate-600">Warmer countries have films</span>
           </p>
+        )}
+
+        {detailsOpen && selectedMovie && (
+          <FilmDetailsSheet
+            // Distinct from the MovieInfo card's key: they are siblings.
+            key={`details-${selectedMovie.id}`}
+            movie={selectedMovie}
+            countries={[...movieFrom, ...movieCoProduced]}
+            moreFromHome={moreFromHome}
+            homeName={countryByIso2.get(selectedMovie.home)?.name ?? null}
+            catalogueIds={catalogueIds}
+            onClose={closeDetails}
+            onSelectCountry={selectCountry}
+            onOpenFilm={openDetails}
+          />
         )}
 
         {debug.panel && <DebugPanel options={debug} posterCount={movies.length} />}

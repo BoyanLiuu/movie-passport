@@ -7,17 +7,27 @@
 // fresh. Without the file the app falls back to the mock catalogue. See
 // docs/decisions/0002-movie-data-source.md.
 
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
-import { discoverIds, discoverPath, TMDB_API, toCatalogue, toFilm } from "./catalogue/tmdb.mjs";
+import {
+  DETAILS_APPEND,
+  discoverIds,
+  discoverPath,
+  TMDB_API,
+  toCatalogue,
+  toDetails,
+  toFilm,
+} from "./catalogue/tmdb.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const COUNTRIES = resolve(root, "public/data/countries-110m.geojson");
 const PLACES = resolve(root, "src/data/places.json");
 const OUTPUT = resolve(root, "public/data/catalogue.json");
 const OVERVIEWS = resolve(root, "public/data/catalogue-overviews.json");
+// One file per film for the details sheet, loaded when it opens.
+const DETAILS_DIR = resolve(root, "public/data/films");
 const CONCURRENCY = 8;
 const MIN_VOTES = 10;
 
@@ -87,10 +97,15 @@ const main = async () => {
   console.log(`Discovered ${ids.length} films across ${codes.length} countries`);
 
   let skipped = 0;
+  const details = new Map();
   const films = (
     await pool(ids, async (id) => {
       try {
-        return toFilm(await tmdb(`/movie/${id}?append_to_response=credits`));
+        const response = await tmdb(`/movie/${id}?append_to_response=${DETAILS_APPEND}`);
+        const film = toFilm(response);
+        const extra = film && toDetails(response);
+        if (film && extra) details.set(film.id, extra);
+        return film;
       } catch (error) {
         skipped++;
         console.warn(`  skipped ${id}: ${error.message}`);
@@ -107,6 +122,12 @@ const main = async () => {
   const json = JSON.stringify(catalogue);
   await mkdir(dirname(OUTPUT), { recursive: true });
   // Write then rename, so a failed run never leaves a half-written file for the app to load.
+  // Details first, into a fresh folder (no stale films), then the catalogue that points at them.
+  await rm(DETAILS_DIR, { recursive: true, force: true });
+  await mkdir(DETAILS_DIR, { recursive: true });
+  await pool([...details.values()], (d) =>
+    writeFile(resolve(DETAILS_DIR, `${d.id}.json`), JSON.stringify(d)),
+  );
   for (const [path, data] of [
     [OVERVIEWS, JSON.stringify(overviews)],
     [OUTPUT, json],

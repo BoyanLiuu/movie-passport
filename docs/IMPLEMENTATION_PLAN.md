@@ -155,10 +155,28 @@ lat, lng, rank }`. Real titles, but **generated** poster art (`src/lib/movies/po
   countries (radius ≤ 0.25°, shrunk near neighbours, wound like Natural Earth's rings). Old codes alias to
   today's country (Burma → Myanmar, Zaire → DR Congo). The fetch also discovers these places' top 10.
 
-### M5 — Polish & ship (optional)
+### M5 — Film details sheet
 
-Performance budget (frame time with N posters), accessibility audit (axe), Lighthouse, attribution page, deploy.
-Deploying is an outward-facing step and is done only with explicit sign-off.
+- **Entry:** a "More details" button on the film card (TMDB films only; the sample films have no details).
+- **Sheet:** a native `<dialog>` that slides up from the bottom (fade with reduced motion); desktop ~90% height and
+  ~960 px wide with the dimmed globe above it, phones near full height with a drag handle. Closes with ✕, Esc, the
+  backdrop, swipe down or browser Back. URL `?film=<id>&details`. The globe pauses rendering while it is open.
+  (Lesson from M4: the overlay ignores the pointer, so the dialog must set `pointer-events: auto`.)
+- **Data:** `scripts/fetch-catalogue.mjs` already requests `/movie/{id}?append_to_response=credits`; append
+  `videos,release_dates,keywords,recommendations,external_ids,watch/providers` and write a trimmed
+  `public/data/films/<id>.json` per film (top 10 cast, key crew, trailer keys, certifications, keywords, ids of
+  recommendations, providers per region). Same request count; gitignored; loaded on open.
+- **Where to watch:** TMDB's provider data is JustWatch's (JustWatch's own API is partner-only, by contract).
+  Region from the browser locale with a picker; must show "Data from JustWatch" and link to JustWatch.
+- **Trailer:** YouTube (`youtube-nocookie.com`) iframe created only when the user presses play.
+- **Our angle:** production-country buttons fly the globe there; "More from {country}" from our catalogue.
+- **Not included:** TMDB's community features (ratings widget, reviews, discussions, contributors, edit history);
+  awards (not in TMDB's public API as far as checked).
+
+### M6 — Polish & ship (optional)
+
+Performance budget (frame time with N posters, globe baseline on slow CPUs), draggable phone sheet, accessibility
+audit (axe), Lighthouse, deploy. Deploying is an outward-facing step and is done only with explicit sign-off.
 
 ## 5. Testing strategy
 
@@ -178,10 +196,10 @@ Deploying is an outward-facing step and is done only with explicit sign-off.
 | Poster image rights                               | Generated placeholders until M4's licence review                              |
 | Disputed territories / missing ISO codes          | Use ADM0_A3 as the stable id; ISO codes are optional fields                   |
 | Small countries are hard to click at 110m         | M3 search box (done); consider 50m data later if needed                       |
-| three.js + globe chunk is ~550 KB gzipped         | Lazy-loaded after first paint (`ssr: false`); revisit in the M5 budget        |
-| Globe alone ~23 fps with the CPU slowed 4×        | Profile the polygon layer, atmosphere and starfield in M5 (see decision 0001) |
+| three.js + globe chunk is ~550 KB gzipped         | Lazy-loaded after first paint (`ssr: false`); revisit in the M6 budget        |
+| Globe alone ~23 fps with the CPU slowed 4×        | Profile the polygon layer, atmosphere and starfield in M6 (see decision 0001) |
 | Poster cap ranks worldwide, not on-screen         | Rank among camera-facing posters once real data lands (M4)                    |
-| Phone sheet covers half the screen for long lists | M5: a draggable sheet with peek / expanded states                             |
+| Phone sheet covers half the screen for long lists | M6: a draggable sheet with peek / expanded states                             |
 
 ## 7. Decisions log
 
@@ -207,3 +225,5 @@ Deploying is an outward-facing step and is done only with explicit sign-off.
 | 18  | Tests intercept `/data/catalogue*.json` instead of a build flag, so one build covers sample and TMDB paths                             | M4        |
 | 19  | Places the map has no shape for become small disc-shaped countries (clickable, searchable, linkable), drawn only with films            | M4        |
 | 20  | Historical states (USSR, Yugoslavia…) get their own disc at their capital, labelled historical; renamed codes alias to today's country | M4        |
+| 21  | Film details as a bottom sheet over the globe, not a separate page; features before polish (M5 details, M6 ship)                       | M5        |
+| 22  | "Where to watch" via TMDB's JustWatch data with JustWatch credit (JustWatch's own API is partner-only)                                 | M5        |

@@ -63,6 +63,20 @@ describe("navigation", () => {
     });
   });
 
+  it("reads and writes the details sheet flag", () => {
+    expect(modeFromSearch("?film=amelie&details", countries, movieIds).mode).toEqual({
+      kind: "movie",
+      movieId: "amelie",
+      details: true,
+    });
+    expect(searchForMode({ kind: "movie", movieId: "amelie", details: true }, "", countries)).toBe(
+      "?film=amelie&details",
+    );
+    expect(searchForMode({ kind: "movie", movieId: "amelie" }, "?film=x&details", countries)).toBe(
+      "?film=amelie",
+    );
+  });
+
   it("writes modes back to the URL, keeping unrelated parameters", () => {
     expect(searchForMode({ kind: "country", countryId: "FRA" }, "", countries)).toBe("?country=FR");
     expect(searchForMode({ kind: "country", countryId: "CYN" }, "", countries)).toBe(

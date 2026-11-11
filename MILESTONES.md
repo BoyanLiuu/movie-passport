@@ -3,17 +3,18 @@
 How to read this: `[x]` done and verified, `[ ]` not yet. Each milestone is done when every box is ticked and
 `pnpm check` passes. Details and rationale live in [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md).
 
-| Milestone                      | Status  | Demo                                                     |
-| ------------------------------ | ------- | -------------------------------------------------------- |
-| M0 — Foundation                | ✅ Done | `pnpm dev` serves the app on http://127.0.0.1:3002       |
-| M1 — Interactive Earth         | ✅ Done | Rotate, hover and click countries; camera focuses; reset |
-| M2 — Placeholder movie posters | ✅ Done | 20 generated posters; click one to open the film         |
-| M3 — Mode A ↔ B                | ✅ Done | Country view lists its films; URL sync; search           |
-| M4 — Real movie data           | ✅ Done | 1,171 real films from TMDB, incl. Hong Kong, USSR…       |
-| M5 — Polish & ship (optional)  | ⚪ Next | Deployed site, a11y and performance budgets met          |
+| Milestone                      | Status  | Demo                                                                |
+| ------------------------------ | ------- | ------------------------------------------------------------------- |
+| M0 — Foundation                | ✅ Done | `pnpm dev` serves the app on http://127.0.0.1:3002                  |
+| M1 — Interactive Earth         | ✅ Done | Rotate, hover and click countries; camera focuses; reset            |
+| M2 — Placeholder movie posters | ✅ Done | 20 generated posters; click one to open the film                    |
+| M3 — Mode A ↔ B                | ✅ Done | Country view lists its films; URL sync; search                      |
+| M4 — Real movie data           | ✅ Done | 1,171 real films from TMDB, incl. Hong Kong, USSR…                  |
+| M5 — Film details sheet        | ✅ Done | "More details" opens a full film page over the globe (UX to refine) |
+| M6 — Polish & ship             | ⚪ Next | Deployed site, a11y and performance budgets met                     |
 
-**Last verified:** 2026-11-11 — `pnpm check` green (lint, typecheck, 92 unit tests, build);
-`pnpm test:e2e` 94 passed, 6 skipped (mouse-only tests on the phone project), desktop Chrome + Pixel 7
+**Last verified:** 2026-11-11 — `pnpm check` green (lint, typecheck, 107 unit tests, build);
+`pnpm test:e2e` 108 passed, 6 skipped (mouse-only tests on the phone project), desktop Chrome + Pixel 7
 emulation. The TMDB token appears in no build output, no public file and no tracked file.
 
 ---
@@ -127,9 +128,54 @@ Worth a manual look:
 
 - [ ] Real data on your screen: `pnpm data:catalogue`, then `pnpm dev`
 
-## M5 — Polish & ship (optional)
+## M5 — Film details sheet ✅
 
-- [ ] Frame-time budget with the full poster set
+Functionality first, as agreed; layout and motion get refined later.
+
+"More details" on a film card opens a sheet that rises from the bottom over the globe: the same
+kinds of information as a TMDB film page, in Movie Passport's own design.
+
+Behaviour:
+
+- [x] "More details" in the film card opens the sheet (desktop: ~90% height, ~960 px wide, globe
+      dimmed above; phones: near full height with a drag handle to swipe it down)
+- [x] Closes with ✕, Esc, the backdrop, swipe down, or browser Back; focus returns to the card
+- [x] Own link, `?film=<id>&details`, so shared links open it
+- [x] Real modal dialog, keyboard-friendly; reduced motion fades instead of sliding
+- [x] Globe pauses rendering while the sheet is open; images lazy-load
+
+Content (version 1):
+
+- [x] Header: backdrop, poster, title, year, age rating, runtime, genres, score
+- [x] Tagline and plot; director and writers
+- [x] Top-billed cast with photos and character names
+- [x] Trailer, press to play (nothing loads from YouTube before that)
+- [x] Facts: status, original language, budget, box office, release date
+- [x] Production countries as buttons that fly the globe there; "More from {country}"
+- [x] Keywords
+- [x] Similar films: those in our catalogue open in the app, others link to TMDB
+- [x] Where to watch in the viewer's country (from the browser, changeable): stream / rent / buy,
+      credited "Data from JustWatch" with a link to JustWatch, as TMDB requires
+- [x] Official site and social links
+
+Data:
+
+- [x] The build fetch also saves one details file per film (`public/data/films/<id>.json`,
+      gitignored like the rest), from the same TMDB request with more appended; loaded on open
+- [x] Left out on purpose: TMDB's community features (ratings widget, reviews, discussions,
+      contributors, edit history) — linked to on TMDB instead
+
+Found and fixed: the sheet and the film card shared a React key (both used the film id), which in
+the production build caused an infinite render loop on `&details` links.
+
+Worth a manual look:
+
+- [ ] The sheet on a real phone: swipe-down on the handle, scrolling, the trailer
+
+## M6 — Polish & ship (optional)
+
+- [ ] Frame-time budget with the full poster set; globe baseline on slow CPUs (~23 fps at 4×)
+- [ ] Draggable country sheet on phones (peek / expanded)
 - [ ] axe accessibility checks in Playwright
 - [ ] Lighthouse pass
-- [ ] Deployed (only with explicit sign-off)
+- [ ] Deployed (only with explicit sign-off); TMDB token in the host's secret settings

@@ -12,6 +12,8 @@ type MovieInfoProps = {
   /** Plot summary, loaded lazily; null while loading or when there is none. */
   overview: string | null;
   onSelectCountry: (countryId: string) => void;
+  /** Opens the full details sheet; absent for sample films, which have no details. */
+  onOpenDetails?: () => void;
   onReset: () => void;
   ref?: Ref<HTMLElement>;
 };
@@ -54,6 +56,7 @@ export const MovieInfo = ({
   coProduced,
   overview,
   onSelectCountry,
+  onOpenDetails,
   onReset,
   ref,
 }: MovieInfoProps) => {
@@ -126,6 +129,16 @@ export const MovieInfo = ({
       </div>
 
       <div className="shrink-0">
+        {onOpenDetails && (
+          <button
+            type="button"
+            data-more-details
+            onClick={onOpenDetails}
+            className="mt-4 w-full rounded-full bg-amber-300 px-4 py-2.5 text-sm font-medium text-slate-950 transition hover:bg-amber-200 focus-visible:ring-2 focus-visible:ring-amber-100 focus-visible:outline-none"
+          >
+            More details
+          </button>
+        )}
         <BackToGlobeButton onClick={onReset} />
       </div>
     </section>

@@ -69,7 +69,7 @@ Revisit and move to sprites (likely an `InstancedMesh` with a poster texture atl
 layer for focus and labels) if any of these becomes true:
 
 - a view needs more than ~150 posters on screen at once, e.g. a "show every film" mode with real data;
-- the M5 phone check misses the frame budget with posters on but not without;
+- the M6 phone check misses the frame budget with posters on but not without;
 - we want posters to sit _in_ the scene (depth, lighting, tilt) rather than on top of it.
 
 ## Consequences and follow-ups
@@ -79,6 +79,6 @@ layer for focus and labels) if any of these becomes true:
   works because they are buttons.
 - **Cap by camera-facing posters (M4):** today the cap takes the top-ranked films worldwide, so
   with real data the visible hemisphere could end up empty. Rank among camera-facing posters instead.
-- **Globe baseline on slow CPUs (M5):** ~23 fps at 4× throttle with no posters at all. Profile the
+- **Globe baseline on slow CPUs (M6):** ~23 fps at 4× throttle with no posters at all. Profile the
   polygon layer (restyling on hover re-runs accessors for 177 countries), atmosphere and starfield.
 - The sprite renderer stays behind `?debug` for re-measuring; it is not a supported user path.

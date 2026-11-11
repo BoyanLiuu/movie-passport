@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { discoverIds, discoverPath, toCatalogue, toFilm } from "./tmdb.mjs";
+import { discoverIds, discoverPath, toCatalogue, toDetails, toFilm } from "./tmdb.mjs";
 
 const amelie = {
   id: 194,
@@ -112,5 +112,146 @@ describe("toCatalogue", () => {
   it("moves plot summaries into their own file", () => {
     expect(catalogue.films[0]).not.toHaveProperty("overview");
     expect(overviews).toEqual({ 194: "At a tiny Parisian café…" });
+  });
+});
+
+describe("toDetails", () => {
+  // Synthetic response in TMDB's shape (no real TMDB data is committed).
+  const response = {
+    id: 42,
+    tagline: "A tagline.",
+    overview: "A plot.",
+    backdrop_path: "/back.jpg",
+    release_date: "2001-04-25",
+    status: "Released",
+    original_language: "fr",
+    budget: 10000000,
+    revenue: 0,
+    homepage: "javascript:alert(1)",
+    credits: {
+      cast: [
+        { name: "Second", character: "B", profile_path: "/b.jpg", order: 1 },
+        { name: "First", character: "A", profile_path: null, order: 0 },
+      ],
+      crew: [
+        { job: "Director", name: "Dee Rector" },
+        { job: "Novel", name: "Nova List" },
+        { job: "Screenplay", name: "Nova List" },
+        { job: "Editor", name: "Ed Itor" },
+      ],
+    },
+    videos: {
+      results: [
+        { site: "YouTube", type: "Teaser", key: "teaser12345", official: true, size: 1080 },
+        { site: "YouTube", type: "Trailer", key: "fanmade1234", official: false, size: 2160 },
+        {
+          site: "YouTube",
+          type: "Trailer",
+          key: "official123",
+          official: true,
+          size: 1080,
+          name: "Official Trailer",
+        },
+        { site: "Vimeo", type: "Trailer", key: "vimeo123456", official: true, size: 2160 },
+      ],
+    },
+    release_dates: {
+      results: [
+        { iso_3166_1: "US", release_dates: [{ certification: "R", type: 3 }] },
+        {
+          iso_3166_1: "FR",
+          release_dates: [
+            { certification: "", type: 3 },
+            { certification: "TP", type: 4 },
+          ],
+        },
+        { iso_3166_1: "AR", release_dates: [{ certification: "", type: 3 }] },
+      ],
+    },
+    keywords: { keywords: [{ name: "paris" }, { name: "love" }] },
+    recommendations: {
+      results: [{ id: 7, title: "Another", release_date: "1999-01-01", poster_path: "/p.jpg" }],
+    },
+    external_ids: {
+      imdb_id: "tt0211915",
+      wikidata_id: "Q484048",
+      facebook_id: null,
+      instagram_id: "a.handle",
+      twitter_id: "bad handle!",
+    },
+    "watch/providers": {
+      results: {
+        US: {
+          link: "https://www.themoviedb.org/movie/42/watch?locale=US",
+          rent: [
+            { provider_id: 2, provider_name: "Second", logo_path: "/2.png", display_priority: 12 },
+            { provider_id: 10, provider_name: "First", logo_path: "/10.png", display_priority: 11 },
+          ],
+          flatrate: [
+            { provider_id: 8, provider_name: "Streamer", logo_path: "/8.png", display_priority: 1 },
+          ],
+        },
+        GB: { link: "https://example.org", buy: [] },
+      },
+    },
+  };
+  const details = toDetails(response);
+
+  it("keeps the header facts and drops unsafe links", () => {
+    expect(details).toMatchObject({
+      id: "42",
+      tagline: "A tagline.",
+      backdrop: "/back.jpg",
+      releaseDate: "2001-04-25",
+      originalLanguage: "fr",
+      budget: 10000000,
+      revenue: null,
+      homepage: null,
+    });
+  });
+
+  it("orders the cast and groups writers' jobs", () => {
+    expect(details.cast.map((c) => c.name)).toEqual(["First", "Second"]);
+    expect(details.directors).toEqual(["Dee Rector"]);
+    expect(details.writers).toEqual([{ name: "Nova List", jobs: ["Novel", "Screenplay"] }]);
+  });
+
+  it("picks the official YouTube trailer", () => {
+    expect(details.trailer).toEqual({ key: "official123", name: "Official Trailer" });
+  });
+
+  it("takes each region's age rating, preferring the theatrical one", () => {
+    expect(details.certifications).toEqual({ US: "R", FR: "TP" });
+  });
+
+  it("trims where-to-watch to non-empty groups in TMDB's display order", () => {
+    expect(details.watch).toEqual({
+      US: {
+        link: "https://www.themoviedb.org/movie/42/watch?locale=US",
+        stream: [{ id: 8, name: "Streamer", logo: "/8.png" }],
+        rent: [
+          { id: 10, name: "First", logo: "/10.png" },
+          { id: 2, name: "Second", logo: "/2.png" },
+        ],
+      },
+    });
+  });
+
+  it("keeps keywords, recommendations and valid external ids", () => {
+    expect(details.keywords).toEqual(["paris", "love"]);
+    expect(details.recommendations).toEqual([
+      { id: "7", title: "Another", year: 1999, poster: "/p.jpg" },
+    ]);
+    expect(details.links).toEqual({
+      imdb: "tt0211915",
+      wikidata: "Q484048",
+      facebook: null,
+      instagram: "a.handle",
+      twitter: null,
+    });
+  });
+
+  it("returns null without an id", () => {
+    expect(toDetails({})).toBeNull();
   });
 });

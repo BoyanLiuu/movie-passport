@@ -62,6 +62,8 @@ export type GlobeSceneProps = {
   capPosters: boolean;
   /** Turn slowly when idle. MovieGlobe enables it in the global view only. */
   autoRotate: boolean;
+  /** Stop rendering while something covers the globe (the details sheet). */
+  paused?: boolean;
   reducedMotion: boolean;
   onHover: (countryId: string | null) => void;
   onSelectCountry: (countryId: string) => void;
@@ -93,6 +95,7 @@ const GlobeScene = ({
   posterRenderer,
   capPosters,
   autoRotate,
+  paused = false,
   reducedMotion,
   onHover,
   onSelectCountry,
@@ -333,6 +336,14 @@ const GlobeScene = ({
       globe.pointOfView(view, reducedMotion ? 0 : RESET_DURATION_MS);
     }
   }, [ready, focus, reducedMotion, aspect]);
+
+  // The details sheet covers the globe: stop rendering frames until it closes.
+  useEffect(() => {
+    const globe = globeRef.current;
+    if (!ready || !globe) return;
+    if (paused) globe.pauseAnimation();
+    else globe.resumeAnimation();
+  }, [ready, paused]);
 
   // Idle auto-rotation: starts after any camera transition settles, pauses while the user drags,
   // and resumes a few seconds after they let go.

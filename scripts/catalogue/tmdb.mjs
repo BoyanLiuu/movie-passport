@@ -93,3 +93,145 @@ export const toCatalogue = (films, { perCountry, minVotes, generatedAt }) => {
     overviews: Object.fromEntries(sorted.filter((f) => f.overview).map((f) => [f.id, f.overview])),
   };
 };
+
+/** The extra data the film details sheet needs, appended to the same /movie/{id} request. */
+export const DETAILS_APPEND =
+  "credits,videos,release_dates,keywords,recommendations,external_ids,watch/providers";
+
+const WRITER_JOBS = new Set(["Screenplay", "Writer", "Novel", "Story", "Author", "Characters"]);
+const httpsUrl = (v) => (typeof v === "string" && /^https?:\/\/[^\s"'<>]+$/i.test(v) ? v : null);
+const imagePath = (v) =>
+  typeof v === "string" && /^\/[\w.-]+\.(jpg|jpeg|png|webp|svg)$/i.test(v) ? v : null;
+const handle = (v) => (typeof v === "string" && /^[\w.-]{1,64}$/.test(v) ? v : null);
+const list = (v) => (Array.isArray(v) ? v : []);
+
+/** Directors, then writers with their jobs ("Novel, Screenplay"), each person once. */
+const keyCrew = (crew) => {
+  const writers = new Map();
+  for (const c of crew) {
+    const name = str(c?.name);
+    if (!name || !WRITER_JOBS.has(c?.job)) continue;
+    writers.set(name, [...(writers.get(name) ?? []), c.job]);
+  }
+  return {
+    directors: unique(
+      crew
+        .filter((c) => c?.job === "Director")
+        .map((c) => str(c?.name))
+        .filter(Boolean),
+    ),
+    writers: [...writers].slice(0, 6).map(([name, jobs]) => ({ name, jobs: unique(jobs) })),
+  };
+};
+
+/** The YouTube trailer to show: official first, then the highest resolution. */
+const pickTrailer = (videos) => {
+  const trailers = list(videos?.results).filter(
+    (v) => v?.site === "YouTube" && v?.type === "Trailer" && /^[\w-]{6,20}$/.test(v?.key ?? ""),
+  );
+  trailers.sort((a, b) => Number(b.official) - Number(a.official) || (b.size ?? 0) - (a.size ?? 0));
+  return trailers[0] ? { key: trailers[0].key, name: str(trailers[0].name) ?? "Trailer" } : null;
+};
+
+/** Age rating per region: the theatrical release's certification when there is one. */
+const certifications = (releaseDates) => {
+  const out = {};
+  for (const region of list(releaseDates?.results)) {
+    const code = isoCode(region?.iso_3166_1);
+    if (!code) continue;
+    const releases = list(region.release_dates).filter((r) => str(r?.certification));
+    const theatrical = releases.find((r) => r.type === 3) ?? releases[0];
+    if (theatrical) out[code] = str(theatrical.certification).slice(0, 12);
+  }
+  return out;
+};
+
+const providerList = (entries) =>
+  list(entries)
+    .filter((p) => num(p?.provider_id) && str(p?.provider_name))
+    .sort((a, b) => (a.display_priority ?? 99) - (b.display_priority ?? 99))
+    .slice(0, 12)
+    .map((p) => ({ id: p.provider_id, name: str(p.provider_name), logo: imagePath(p.logo_path) }));
+
+/** Where to watch, per region (JustWatch data via TMDB): stream / free / with ads / rent / buy. */
+const watchProviders = (providers) => {
+  const out = {};
+  for (const [region, entry] of Object.entries(providers?.results ?? {})) {
+    if (!isoCode(region)) continue;
+    const groups = {
+      stream: providerList(entry?.flatrate),
+      free: providerList(entry?.free),
+      ads: providerList(entry?.ads),
+      rent: providerList(entry?.rent),
+      buy: providerList(entry?.buy),
+    };
+    const kept = Object.fromEntries(Object.entries(groups).filter(([, v]) => v.length));
+    if (Object.keys(kept).length) out[region] = { link: httpsUrl(entry?.link), ...kept };
+  }
+  return out;
+};
+
+/**
+ * Everything the details sheet shows for one film, trimmed from the full TMDB response (about
+ * 120 KB) to roughly a tenth. Returns null when the response has no usable id.
+ */
+export const toDetails = (details) => {
+  const id = num(details?.id);
+  if (!id) return null;
+  const crew = list(details.credits?.crew);
+  const external = details.external_ids ?? {};
+  return {
+    id: String(id),
+    tagline: str(details.tagline),
+    overview: str(details.overview),
+    backdrop: imagePath(details.backdrop_path),
+    releaseDate: /^\d{4}-\d{2}-\d{2}$/.test(details.release_date ?? "")
+      ? details.release_date
+      : null,
+    status: str(details.status),
+    originalLanguage:
+      typeof details.original_language === "string" ? details.original_language.slice(0, 3) : null,
+    budget: num(details.budget) || null,
+    revenue: num(details.revenue) || null,
+    homepage: httpsUrl(details.homepage),
+    certifications: certifications(details.release_dates),
+    ...keyCrew(crew),
+    cast: list(details.credits?.cast)
+      .filter((c) => str(c?.name))
+      .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
+      .slice(0, 10)
+      .map((c) => ({
+        name: str(c.name),
+        character: str(c.character),
+        photo: imagePath(c.profile_path),
+      })),
+    trailer: pickTrailer(details.videos),
+    keywords: list(details.keywords?.keywords)
+      .map((k) => str(k?.name))
+      .filter(Boolean)
+      .slice(0, 20),
+    recommendations: list(details.recommendations?.results)
+      .filter((r) => num(r?.id) && str(r?.title))
+      .slice(0, 12)
+      .map((r) => ({
+        id: String(r.id),
+        title: str(r.title),
+        year: Number.parseInt(String(r.release_date ?? "").slice(0, 4), 10) || null,
+        poster: imagePath(r.poster_path),
+      })),
+    links: {
+      imdb:
+        typeof external.imdb_id === "string" && /^tt\d+$/.test(external.imdb_id)
+          ? external.imdb_id
+          : null,
+      wikidata:
+        typeof external.wikidata_id === "string" && /^Q\d+$/.test(external.wikidata_id)
+          ? external.wikidata_id
+          : null,
+      facebook: handle(external.facebook_id),
+      instagram: handle(external.instagram_id),
+      twitter: handle(external.twitter_id),
+    },
+    watch: watchProviders(details["watch/providers"]),
+  };
+};

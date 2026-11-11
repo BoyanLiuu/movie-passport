@@ -242,3 +242,37 @@ body {
   font-style: normal;
   color: var(--color-slate-300);
 }
+
+/* ---- Film details sheet: rises from the bottom over the globe -------------------------------- */
+
+.details-sheet[open] {
+  animation: sheet-up 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.details-sheet[open]::backdrop {
+  animation: sheet-backdrop 380ms ease both;
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes sheet-backdrop {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .details-sheet[open] {
+    animation: sheet-fade 160ms ease both;
+  }
+
+  @keyframes sheet-fade {
+    from {
+      opacity: 0;
+    }
+  }
+}
