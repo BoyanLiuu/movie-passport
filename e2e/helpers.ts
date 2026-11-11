@@ -42,8 +42,10 @@ export const openGlobe = async (
   // Reduced motion makes camera moves instant and turns off auto-rotation: deterministic tests.
   await page.emulateMedia({ reducedMotion: reducedMotion ? "reduce" : "no-preference" });
   // Country tests turn posters off: a poster correctly wins a click over the country beneath it.
-  await page.goto(query || (posters ? "/" : "/?debug&posters=0"));
-  await expect(page.getByTestId("globe-canvas")).toHaveAttribute("data-ready", "true");
+  await page.goto(query || (posters ? "/" : "/?debug=quiet&posters=0"));
+  await expect(page.getByTestId("globe-canvas")).toHaveAttribute("data-ready", "true", {
+    timeout: 20_000,
+  });
   await page.waitForFunction(() => !!window.__moviePassportGlobe);
 };
 

@@ -77,7 +77,7 @@ layer for focus and labels) if any of these becomes true:
 - **Pointer handling:** markers ignore the pointer (`pointer-events: none`) and the globe hit-tests
   them, so dragging and scroll-zooming over a poster keep moving the globe. Keyboard focus still
   works because they are buttons.
-- **Cap by camera-facing posters (M3/M4):** today the cap takes the top-ranked films worldwide, so
+- **Cap by camera-facing posters (M4):** today the cap takes the top-ranked films worldwide, so
   with real data the visible hemisphere could end up empty. Rank among camera-facing posters instead.
 - **Globe baseline on slow CPUs (M5):** ~23 fps at 4× throttle with no posters at all. Profile the
   polygon layer (restyling on hover re-runs accessors for 177 countries), atmosphere and starfield.

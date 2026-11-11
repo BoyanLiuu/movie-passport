@@ -31,3 +31,15 @@ export const setSearchParam = (key: string, value: string | null) => {
   window.history.replaceState(window.history.state, "", url);
   window.dispatchEvent(new Event(URL_CHANGE));
 };
+
+/**
+ * Navigates to a new query string. `push` adds a history entry, so browser Back returns to the
+ * previous view; Next.js integrates native pushState/replaceState with its router.
+ */
+export const navigateToSearch = (search: string, { replace = false } = {}) => {
+  if (search === window.location.search) return;
+  const url = `${window.location.pathname}${search}${window.location.hash}`;
+  if (replace) window.history.replaceState(window.history.state, "", url);
+  else window.history.pushState(null, "", url);
+  window.dispatchEvent(new Event(URL_CHANGE));
+};

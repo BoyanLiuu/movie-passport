@@ -1,3 +1,4 @@
+import type { Ref } from "react";
 import type { Movie } from "@/data/movies";
 import type { Country } from "@/lib/geo/countries";
 import { BackToGlobeButton } from "./BackToGlobeButton";
@@ -9,14 +10,16 @@ type MovieInfoProps = {
   countries: Country[];
   onSelectCountry: (countryId: string) => void;
   onReset: () => void;
+  ref?: Ref<HTMLElement>;
 };
 
 /** Movie view overlay: same placement as CountryInfo (card on wide screens, sheet on phones). */
-export const MovieInfo = ({ movie, countries, onSelectCountry, onReset }: MovieInfoProps) => (
+export const MovieInfo = ({ movie, countries, onSelectCountry, onReset, ref }: MovieInfoProps) => (
   <section
+    ref={ref}
     aria-labelledby="movie-info-title"
     data-testid="movie-info"
-    className="pointer-events-auto absolute inset-x-3 bottom-3 animate-panel-in rounded-2xl border border-white/10 bg-slate-950/75 p-5 shadow-2xl shadow-black/50 backdrop-blur-md sm:inset-x-auto sm:top-24 sm:right-6 sm:bottom-auto sm:w-80"
+    className="pointer-events-auto absolute inset-x-3 bottom-3 animate-panel-in rounded-2xl border border-white/10 bg-slate-950/75 p-5 shadow-2xl shadow-black/50 backdrop-blur-md sm:inset-x-auto sm:top-40 sm:right-6 sm:bottom-auto sm:w-80 lg:top-24"
   >
     <div className="flex gap-4">
       {/* eslint-disable-next-line @next/next/no-img-element -- generated SVG data URL */}
@@ -31,7 +34,8 @@ export const MovieInfo = ({ movie, countries, onSelectCountry, onReset }: MovieI
         </p>
         <h2
           id="movie-info-title"
-          className="mt-1 font-display text-3xl leading-tight text-slate-50"
+          tabIndex={-1}
+          className="mt-1 font-display text-3xl leading-tight text-slate-50 focus:outline-none"
         >
           {movie.title}
         </h2>

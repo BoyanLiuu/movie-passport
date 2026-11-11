@@ -8,12 +8,12 @@ How to read this: `[x]` done and verified, `[ ]` not yet. Each milestone is done
 | M0 — Foundation                | ✅ Done        | `pnpm dev` serves the app on http://127.0.0.1:3002       |
 | M1 — Interactive Earth         | ✅ Done        | Rotate, hover and click countries; camera focuses; reset |
 | M2 — Placeholder movie posters | ✅ Done        | 20 generated posters; click one to open the film         |
-| M3 — Mode A ↔ B                | ⚪ Next        | Country view lists its movies; URL sync; search          |
-| M4 — Real movie data           | ⚪ Not started | Licensed metadata from a chosen source                   |
+| M3 — Mode A ↔ B                | ✅ Done        | Country view lists its films; URL sync; search           |
+| M4 — Real movie data           | ⚪ Next        | Licensed metadata from a chosen source                   |
 | M5 — Polish & ship (optional)  | ⚪ Not started | Deployed site, a11y and performance budgets met          |
 
-**Last verified:** 2026-11-11 — `pnpm check` green (lint, typecheck, 44 unit tests, build);
-`pnpm test:e2e` 54 passed, 4 skipped (mouse-only tests on the phone project), desktop Chrome + Pixel 7
+**Last verified:** 2026-11-11 — `pnpm check` green (lint, typecheck, 64 unit tests, build);
+`pnpm test:e2e` 78 passed, 6 skipped (mouse-only tests on the phone project), desktop Chrome + Pixel 7
 emulation, stable over 2 repeats.
 
 ---
@@ -80,15 +80,26 @@ Worth a manual look:
 
 - [ ] Poster size and density feel right on your screen (try `/?debug` to see the frame rate)
 
-## M3 — Mode A ↔ B
+## M3 — Mode A ↔ B ✅
 
-- [ ] Global / country UI states share one globe instance
-- [ ] Posters filtered to the selected country, animated in/out
-- [ ] Responsive movie list panel with simple statistics
-- [ ] Countries with movies are shaded; empty state for countries without
-- [ ] URL sync (`?country=FR`), browser Back returns to Mode A
-- [ ] Keyboard-accessible country search
-- [ ] Loading and empty states; reduced-motion pass
+- [x] Global / country UI states share one globe instance (e2e checks the canvas is never replaced)
+- [x] Posters filtered to the selected country, animated in/out (others fade and shrink away)
+- [x] Responsive movie list panel with simple statistics (films, decades, co-productions; "with
+      Germany" lines; hovering a film points at its poster)
+- [x] Countries with movies are shaded (warmer with more films; count in the tooltip); empty state
+      for countries without, suggesting the nearest countries that have films
+- [x] URL sync: `?country=FR`, `?film=amelie`; browser Back/Forward move between views; unknown
+      links show a notice and the whole globe
+- [x] Keyboard-accessible search for countries and films: `/` to focus, arrows, Enter, Escape;
+      accent-insensitive, finds ISO codes, original titles and directors
+- [x] Loading and empty states; reduced-motion pass (no poster, panel or offset animation)
+
+Also: the globe slides out from under the open panel (left of the card on desktop; into the band
+between the search bar and the sheet on phones), so the focused country stays visible.
+
+Worth a manual look:
+
+- [ ] Search and the country list on a real phone (the sheet covers half the screen for big lists)
 
 ## M4 — Real movie data
 

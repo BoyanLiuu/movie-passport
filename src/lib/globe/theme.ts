@@ -8,8 +8,14 @@ export const globeTheme = {
   atmosphereAltitude: 0.17,
 
   land: "rgba(148, 163, 184, 0.16)",
+  /** Countries with films in the catalogue glow warmer, by count: 1, 2, 3+. */
+  landWithFilms: [
+    "rgba(253, 224, 140, 0.13)",
+    "rgba(253, 224, 140, 0.19)",
+    "rgba(253, 224, 140, 0.26)",
+  ],
   landDimmed: "rgba(148, 163, 184, 0.07)",
-  landHover: "rgba(251, 191, 36, 0.42)",
+  landHover: "rgba(251, 191, 36, 0.48)",
   landSelected: "rgba(251, 191, 36, 0.82)",
   side: "rgba(15, 23, 42, 0.55)",
   sideSelected: "rgba(217, 119, 6, 0.6)",
@@ -36,6 +42,13 @@ const HTML_ESCAPES: Record<string, string> = {
 
 export const escapeHtml = (text: string) => text.replace(/[&<>"']/g, (ch) => HTML_ESCAPES[ch]);
 
+export const landColorFor = (filmCount: number) =>
+  filmCount <= 0
+    ? globeTheme.land
+    : globeTheme.landWithFilms[Math.min(filmCount, globeTheme.landWithFilms.length) - 1];
+
 /** Hover tooltip. react-globe.gl takes an HTML string, so every value is escaped. */
-export const countryTooltipHtml = (name: string, continent: string) =>
-  `<div class="globe-tooltip"><strong>${escapeHtml(name)}</strong><span>${escapeHtml(continent)}</span></div>`;
+export const countryTooltipHtml = (name: string, continent: string, films?: string) =>
+  `<div class="globe-tooltip"><strong>${escapeHtml(name)}</strong><span>${escapeHtml(continent)}</span>${
+    films ? `<em>${escapeHtml(films)}</em>` : ""
+  }</div>`;

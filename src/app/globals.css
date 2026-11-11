@@ -183,13 +183,47 @@ body {
   opacity: 1;
 }
 
-/* Far side of the globe: gone, and out of the tab order. */
-.poster-anchor[data-hidden] .poster {
+/* Hovering the film in the country's list points at its poster. */
+.poster-anchor[data-linked] {
+  z-index: 100000 !important;
+}
+
+.poster-anchor[data-linked] .poster {
+  transform: translateX(-50%) scale(1.18);
+  box-shadow:
+    0 10px 24px -8px rgb(0 0 0 / 0.9),
+    0 0 0 2px var(--color-amber-200);
+}
+
+.poster-anchor[data-linked] .poster-label {
+  opacity: 1;
+}
+
+/* New markers rise into place. */
+.poster {
+  animation: poster-in 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes poster-in {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+
+/* Far side of the globe, or filtered out by the selected country: gone, and out of the tab order. */
+.poster-anchor[data-hidden] .poster,
+.poster-anchor[data-out] .poster {
   opacity: 0;
   visibility: hidden;
 }
 
-.poster-anchor[data-hidden]::after {
+.poster-anchor[data-out] .poster {
+  transform: translateX(-50%) scale(0.7);
+}
+
+.poster-anchor[data-hidden]::after,
+.poster-anchor[data-out]::after {
   opacity: 0;
 }
 
@@ -197,6 +231,14 @@ body {
   .poster,
   .poster-label,
   .poster-anchor::after {
+    animation: none;
     transition: none;
   }
+}
+
+.globe-tooltip em {
+  margin-top: 2px;
+  font-size: 12px;
+  font-style: normal;
+  color: var(--color-slate-300);
 }

@@ -24,7 +24,8 @@ import {
   RESET_DURATION_MS,
 } from "@/lib/geo/camera";
 import { countryAt, type Country } from "@/lib/geo/countries";
-import { countryTooltipHtml, globeTheme as theme } from "@/lib/globe/theme";
+import { filmCountLabel } from "@/lib/catalogue";
+import { countryTooltipHtml, globeTheme as theme, landColorFor } from "@/lib/globe/theme";
 import { posterLimit, posterWidth, visiblePosters } from "@/lib/movies/posters";
 import { createPosterElement, posterAt, setPosterVisibility } from "./posters/htmlPosters";
 import { createSpritePosters, type SpritePosters } from "./posters/spritePosters";
@@ -40,8 +41,16 @@ export type GlobeSceneProps = {
   hoveredId: string | null;
   /** What the camera frames; null is the global view. */
   focus: FocusTarget | null;
+  /** Films in the catalogue per country id: lit countries, and the count in the tooltip. */
+  filmCounts: ReadonlyMap<string, number>;
   movies: Movie[];
+  /** In country view, the films that keep their posters; the rest fade out. null shows all. */
+  focusMovieIds: string[] | null;
   selectedMovieId: string | null;
+  /** A film highlighted from outside the globe (e.g. hovering it in the country's film list). */
+  linkedMovieId: string | null;
+  /** Shift (px) of the globe's centre, to keep the focus clear of an open panel. Eased here. */
+  viewOffset: [number, number];
   posterRenderer: PosterRenderer;
   /** Show only the top-ranked posters when zoomed out (on unless stress-testing). */
   capPosters: boolean;
@@ -57,6 +66,8 @@ export type GlobeSceneProps = {
 const CLICK_SLOP_PX = 6;
 /** Posters float just above the polygons, in globe radii. */
 const POSTER_ALTITUDE = 0.01;
+/** How long the globe takes to slide out from under a panel. */
+const OFFSET_DURATION_MS = 900;
 /** The globe's build-in spin (react-globe.gl `animateIn`) lasts 1.2 s. */
 const ANIMATE_IN_MS = 1300;
 
@@ -67,8 +78,12 @@ const GlobeScene = ({
   highlightedIds,
   hoveredId,
   focus,
+  filmCounts,
   movies,
+  focusMovieIds,
   selectedMovieId,
+  linkedMovieId,
+  viewOffset,
   posterRenderer,
   capPosters,
   autoRotate,
@@ -114,10 +129,20 @@ const GlobeScene = ({
   // ---- Posters -------------------------------------------------------------------------------
 
   const [posterCap, setPosterCap] = useState(() => posterLimit(initialView().altitude));
-  const shownPosters = useMemo(
-    () => visiblePosters(movies, capPosters ? posterCap : Infinity, selectedMovieId),
-    [movies, capPosters, posterCap, selectedMovieId],
+  const focusKey = focusMovieIds?.join(",") ?? null;
+  const focusSet = useMemo(
+    () => (focusKey === null ? null : new Set(focusKey ? focusKey.split(",") : [])),
+    [focusKey],
   );
+  // The capped global set, plus the focused country's films. Posters outside the focus stay
+  // rendered but faded out (data-out), so they can animate out and back in.
+  const shownPosters = useMemo(() => {
+    const base = visiblePosters(movies, capPosters ? posterCap : Infinity, selectedMovieId);
+    if (!focusSet) return base;
+    const extra = movies.filter((m) => focusSet.has(m.id) && !base.includes(m));
+    return [...base, ...extra];
+  }, [movies, capPosters, posterCap, selectedMovieId, focusSet]);
+  const focusSetRef = useRef(focusSet);
   const anchors = useRef(new Map<string, HTMLElement>());
   // While the pointer is on a poster, the country underneath shouldn't light up as well.
   const [posterHovered, setPosterHovered] = useState(false);
@@ -127,6 +152,7 @@ const GlobeScene = ({
   useEffect(() => {
     selectedMovieRef.current = selectedMovieId;
     onSelectMovieRef.current = onSelectMovie;
+    focusSetRef.current = focusSet;
   });
 
   /** Poster width in world units that appears `px` wide at this altitude (sprites only). */
@@ -159,6 +185,7 @@ const GlobeScene = ({
     const movie = d as Movie;
     const anchor = createPosterElement(movie, (id) => onSelectMovieRef.current(id));
     anchor.toggleAttribute("data-selected", movie.id === selectedMovieRef.current);
+    anchor.toggleAttribute("data-out", !!focusSetRef.current && !focusSetRef.current.has(movie.id));
     anchors.current.set(movie.id, anchor);
     return anchor;
   }, []);
@@ -166,8 +193,10 @@ const GlobeScene = ({
   useEffect(() => {
     for (const [id, anchor] of anchors.current) {
       anchor.toggleAttribute("data-selected", id === selectedMovieId);
+      anchor.toggleAttribute("data-linked", id === linkedMovieId);
+      anchor.toggleAttribute("data-out", !!focusSet && !focusSet.has(id));
     }
-  }, [selectedMovieId, shownPosters]);
+  }, [selectedMovieId, linkedMovieId, focusSet, shownPosters]);
 
   useEffect(() => {
     if (!ready) return;
@@ -179,7 +208,8 @@ const GlobeScene = ({
   useEffect(() => {
     const globe = globeRef.current;
     if (!settled || !globe || posterRenderer !== "sprites") return;
-    const group = createSpritePosters(shownPosters, (lat, lng) =>
+    const spriteSet = focusSet ? shownPosters.filter((m) => focusSet.has(m.id)) : shownPosters;
+    const group = createSpritePosters(spriteSet, (lat, lng) =>
       globe.getCoords(lat, lng, POSTER_ALTITUDE),
     );
     const { altitude } = globe.pointOfView();
@@ -191,9 +221,34 @@ const GlobeScene = ({
       group.dispose();
       sprites.current = null;
     };
-  }, [settled, posterRenderer, shownPosters, spriteWidth]);
+  }, [settled, posterRenderer, shownPosters, focusSet, spriteWidth]);
 
   // ---- Scene and camera ----------------------------------------------------------------------
+
+  // Ease the globe's centre towards the requested offset alongside the camera move.
+  const [targetX, targetY] = viewOffset;
+  const [offset, setOffset] = useState<[number, number]>([0, 0]);
+  const offsetRef = useRef(offset);
+  useEffect(() => {
+    const from = offsetRef.current;
+    if (from[0] === targetX && from[1] === targetY) return;
+    const duration = reducedMotion ? 0 : OFFSET_DURATION_MS;
+    const start = performance.now();
+    let frame = 0;
+    const step = (now: number) => {
+      const t = duration ? Math.min(1, (now - start) / duration) : 1;
+      const eased = t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2;
+      const next: [number, number] = [
+        from[0] + (targetX - from[0]) * eased,
+        from[1] + (targetY - from[1]) * eased,
+      ];
+      offsetRef.current = next;
+      setOffset(next);
+      if (t < 1) frame = requestAnimationFrame(step);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [targetX, targetY, reducedMotion]);
 
   // Scene setup once the globe exists: first viewpoint, zoom limits, starfield.
   useEffect(() => {
@@ -274,9 +329,9 @@ const GlobeScene = ({
       const { id } = asCountry(d);
       if (highlighted.has(id)) return theme.landSelected;
       if (id === hoveredCountryId) return theme.landHover;
-      return highlighted.size > 0 ? theme.landDimmed : theme.land;
+      return highlighted.size > 0 ? theme.landDimmed : landColorFor(filmCounts.get(id) ?? 0);
     },
-    [highlighted, hoveredCountryId],
+    [highlighted, hoveredCountryId, filmCounts],
   );
   const sideColor = useCallback(
     (d: object) => (highlighted.has(asCountry(d).id) ? theme.sideSelected : theme.side),
@@ -303,9 +358,10 @@ const GlobeScene = ({
   const label = useCallback(
     (d: object) => {
       const { id, name, continent } = asCountry(d);
-      return highlighted.has(id) ? "" : countryTooltipHtml(name, continent);
+      if (highlighted.has(id)) return "";
+      return countryTooltipHtml(name, continent, filmCountLabel(filmCounts.get(id) ?? 0));
     },
-    [highlighted],
+    [highlighted, filmCounts],
   );
 
   const handleHover = useCallback(
@@ -405,6 +461,7 @@ const GlobeScene = ({
           width={size.width}
           height={size.height}
           backgroundColor="rgba(0,0,0,0)"
+          globeOffset={offset}
           rendererConfig={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
           globeMaterial={globeMaterial}
           animateIn={!reducedMotion}

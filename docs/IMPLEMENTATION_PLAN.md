@@ -123,12 +123,17 @@ lat, lng, rank }`. Real titles, but **generated** poster art (`src/lib/movies/po
 
 ### M3 — Mode A ↔ B (brief §7)
 
-- Filter posters to the selected country; animate posters out/in during the camera move.
-- Responsive side panel: movie list, simple stats (count, decade spread, co-productions).
-- Shade countries that have movies; empty state for countries with none.
-- URL sync (`?country=FR`) so Back/Forward and shared links work.
-- Keyboard-accessible country search (the canvas itself is not keyboard-operable).
-- Loading skeletons; reduced-motion pass.
+- **The URL is the state** (`src/lib/navigation.ts`): `?country=FR` (ISO alpha-2, or the Natural Earth id when
+  there is none) and `?film=amelie`, written with native `history.pushState` (Next.js integrates it), so
+  Back/Forward and shared links work. Unknown values show a notice and the whole globe.
+- Posters outside the selected country stay rendered but fade out (`data-out`), so they animate both ways.
+- Country panel (`CountryInfo`): stats (films, decades, co-productions), film list with co-production
+  partners, hover a film to point at its poster; empty state suggests the nearest countries with films
+  (`src/lib/catalogue.ts`).
+- Countries with films are tinted warmer by count, with the count in the tooltip.
+- Search (`SearchBox`, ARIA combobox): countries and films, accent-insensitive, ISO codes, original titles,
+  directors (`src/lib/search.ts`); `/` focuses it; picking a result moves focus to the panel heading.
+- The globe's centre eases out from under the open panel (`usePanelOffset` → `globeOffset`).
 
 ### M4 — Real movie data (brief §8) — research first
 
@@ -153,13 +158,17 @@ Deploying is an outward-facing step and is done only with explicit sign-off.
 
 ## 6. Risks
 
-| Risk                                      | Mitigation                                                               |
-| ----------------------------------------- | ------------------------------------------------------------------------ |
-| WebGL code running during SSR             | Only `GlobeScene` imports the library, and only via `ssr: false`         |
-| Hundreds of HTML posters tank frame rate  | Visibility culling + caps in M2; compare with Three.js sprites before M3 |
-| Poster image rights                       | Generated placeholders until M4's licence review                         |
-| Disputed territories / missing ISO codes  | Use ADM0_A3 as the stable id; ISO codes are optional fields              |
-| Small countries are hard to click at 110m | M3 search box; consider 50m data later if needed                         |
+| Risk                                              | Mitigation                                                                    |
+| ------------------------------------------------- | ----------------------------------------------------------------------------- |
+| WebGL code running during SSR                     | Only `GlobeScene` imports the library, and only via `ssr: false`              |
+| Hundreds of HTML posters tank frame rate          | Visibility culling + caps in M2; compare with Three.js sprites before M3      |
+| Poster image rights                               | Generated placeholders until M4's licence review                              |
+| Disputed territories / missing ISO codes          | Use ADM0_A3 as the stable id; ISO codes are optional fields                   |
+| Small countries are hard to click at 110m         | M3 search box (done); consider 50m data later if needed                       |
+| three.js + globe chunk is ~550 KB gzipped         | Lazy-loaded after first paint (`ssr: false`); revisit in the M5 budget        |
+| Globe alone ~23 fps with the CPU slowed 4×        | Profile the polygon layer, atmosphere and starfield in M5 (see decision 0001) |
+| Poster cap ranks worldwide, not on-screen         | Rank among camera-facing posters once real data lands (M4)                    |
+| Phone sheet covers half the screen for long lists | M5: a draggable sheet with peek / expanded states                             |
 
 ## 7. Decisions log
 
@@ -175,3 +184,7 @@ Deploying is an outward-facing step and is done only with explicit sign-off.
 | 8   | Posters as HTML markers, max 60 rendered; sprites kept behind `?debug` (decision record 0001)                               | M2        |
 | 9   | Poster markers are click-through; the globe hit-tests them so drag/zoom work over posters                                   | M2        |
 | 10  | Movie mode highlights every production country; poster pinned at a city tied to the film                                    | M2        |
+| 11  | The URL is the source of truth for the selection (`?country=`, `?film=`); native pushState                                  | M3        |
+| 12  | Country param is ISO alpha-2 when it exists (shareable, readable), else Natural Earth id                                    | M3        |
+| 13  | Shift the globe (`globeOffset`) to keep the focus clear of panels, rather than re-aiming the camera                         | M3        |
+| 14  | `?debug=quiet` applies debug options without the panel (browser tests use it to turn posters off)                           | M3        |

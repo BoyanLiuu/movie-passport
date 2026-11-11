@@ -19,6 +19,8 @@ export default defineConfig({
   fullyParallel: true,
   workers: process.platform === "darwin" ? 4 : 2,
   timeout: 60_000,
+  // WebGL pages are heavy; give assertions headroom on a busy machine.
+  expect: { timeout: 10_000 },
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",

@@ -10,10 +10,15 @@ describe("parseDebugOptions", () => {
   it("reads renderer, poster count and cap", () => {
     expect(parseDebugOptions("?debug&renderer=sprites&posters=300&cap=0")).toEqual({
       enabled: true,
+      panel: true,
       renderer: "sprites",
       posters: 300,
       cap: false,
     });
+  });
+
+  it("can apply options without showing the panel", () => {
+    expect(parseDebugOptions("?debug=quiet&posters=0")).toMatchObject({ panel: false, posters: 0 });
   });
 
   it("falls back to safe values for bad input", () => {

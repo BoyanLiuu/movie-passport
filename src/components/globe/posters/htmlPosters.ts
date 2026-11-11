@@ -54,8 +54,12 @@ export const createPosterElement = (movie: Movie, onActivate: (movieId: string) 
 export const setPosterVisibility = (anchor: HTMLElement, isVisible: boolean) =>
   anchor.toggleAttribute("data-hidden", !isVisible);
 
+/** On screen and clickable: attached, facing the camera, not faded out by a country filter. */
 const isShown = (anchor: HTMLElement) =>
-  anchor.isConnected && !anchor.hasAttribute("data-hidden") && anchor.style.display !== "none";
+  anchor.isConnected &&
+  !anchor.hasAttribute("data-hidden") &&
+  !anchor.hasAttribute("data-out") &&
+  anchor.style.display !== "none";
 
 /** The topmost visible poster under a viewport point (the layer z-orders nearer markers higher). */
 export const posterAt = (anchors: Iterable<HTMLElement>, x: number, y: number) => {

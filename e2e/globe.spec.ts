@@ -53,9 +53,8 @@ test.describe("country selection", () => {
       const c = await selectCountry(page, id);
 
       await expect(page.locator("[data-mode]")).toHaveAttribute("data-mode", "country");
-      await expect(page.getByTestId("announcer")).toHaveText(
-        `${c.name} selected. Press Escape to return to the globe.`,
-      );
+      await expect(page.getByTestId("announcer")).toContainText(`${c.name} selected`);
+      await expect(page.getByTestId("announcer")).toContainText("Press Escape to return");
 
       const expected = focusView(c, aspect(page));
       const pov = await pointOfView(page);

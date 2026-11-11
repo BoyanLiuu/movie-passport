@@ -38,7 +38,11 @@ The first `pnpm test:e2e` needs a Playwright browser: `pnpm exec playwright inst
 - **Hover** a country to highlight it; **click / tap** to focus the camera on it.
 - **Click / tap a poster** to open the film: the camera flies to it and every production country
   lights up. Posters are also reachable with **Tab** and **Enter**.
-- **Back to globe** or **Esc** zooms back out.
+- **Search** (press **/**) for a country or a film: arrow keys and Enter work, and it finds
+  ISO codes ("jp"), original titles and directors.
+- In a country, the panel lists its films; countries with films glow warmer on the globe.
+- **Back to globe** or **Esc** zooms back out. Every view has its own link — `?country=FR`,
+  `?film=amelie` — so browser Back/Forward and shared links work.
 - With _reduce motion_ turned on in your OS, auto-rotation is off and camera moves are instant.
 
 ## How it fits together
