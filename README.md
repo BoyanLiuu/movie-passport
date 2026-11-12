@@ -4,6 +4,8 @@ Travel the world through films: an interactive 3D globe for exploring movies cou
 pick a country to see what it has made, open a film for its cast, trailer and where to watch it, and follow
 links back across the globe. About 1,200 real films from TMDB; a non-commercial project.
 
+**Live: <https://movie-passport-eight.vercel.app/>**
+
 - **Progress:** [`MILESTONES.md`](MILESTONES.md) — what is done, what is next
 - **Plan and decisions:** [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md) and
   [`docs/decisions/`](docs/decisions/)
@@ -122,6 +124,19 @@ Without a catalogue the app shows a hand-picked sample of 20 films with generate
 Typefaces: [Cinzel](https://fonts.google.com/specimen/Cinzel) and
 [Spectral](https://fonts.google.com/specimen/Spectral) (SIL Open Font License), self-hosted at build
 time. Icons: [Lucide](https://lucide.dev/) (ISC).
+
+## Deploying
+
+The live site runs on [Vercel](https://vercel.com/), built from `main`. Project settings:
+
+- **Build Command:** `pnpm data:catalogue && pnpm build`, so every deploy fetches the catalogue
+  from TMDB first (it is never committed).
+- **Environment variables** (Production and Preview):
+  - `TMDB_READ_TOKEN`, marked Sensitive. Only the build reads it; it never reaches the browser.
+  - `ENABLE_EXPERIMENTAL_COREPACK=1`, so Vercel installs the pnpm version pinned in `package.json`.
+
+Redeploy at least every 6 months (monthly is better) to refresh the data within TMDB's caching
+limit.
 
 ## Debug panel
 

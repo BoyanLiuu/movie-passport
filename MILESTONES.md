@@ -11,7 +11,7 @@ How to read this: `[x]` done and verified, `[ ]` not yet. Each milestone is done
 | M3 — Mode A ↔ B                | ✅ Done | Country view lists its films; URL sync; search                      |
 | M4 — Real movie data           | ✅ Done | 1,171 real films from TMDB, incl. Hong Kong, USSR…                  |
 | M5 — Film details sheet        | ✅ Done | "More details" opens a full film page over the globe (UX to refine) |
-| M6 — Polish & ship             | 🟡 Now  | Redesign, 60 fps at 4× CPU, Lighthouse done; axe checks and deploy  |
+| M6 — Polish & ship             | 🟡 Now  | Live on Vercel; redesign, 60 fps at 4× CPU, Lighthouse; axe remains |
 
 **Last verified:** 2026-11-11, after the Velvet Night redesign — `pnpm check` green (lint, typecheck, 109 unit tests, build);
 `pnpm test:e2e` 108 passed, 6 skipped (mouse-only tests on the phone project), desktop Chrome + Pixel 7
@@ -190,4 +190,5 @@ Worth a manual look:
 - [ ] axe accessibility checks in Playwright
 - [x] Lighthouse pass: desktop 97–99, mobile 73–74 performance; 100 accessibility, best
       practices and SEO on both
-- [ ] Deployed (only with explicit sign-off); TMDB token in the host's secret settings
+- [x] Deployed on Vercel: <https://movie-passport-eight.vercel.app/> (TMDB token in Vercel's
+      sensitive environment variables; verified absent from every file the site serves)
