@@ -400,8 +400,9 @@ export const MovieGlobe = () => {
             onReset={reset}
           />
         )}
-        {/* The engraved caption on the plate's lower margin: what to do next. */}
-        {mode.kind === "global" && state.status === "ready" && (
+        {/* The engraved caption on the plate's lower margin: what to do next. Shown while the map
+            loads too: it is the first thing worth reading. */}
+        {mode.kind === "global" && state.status !== "error" && (
           <div className="absolute inset-x-0 bottom-6 px-6 text-center sm:bottom-8">
             <p className="engraved text-[12px] text-silver sm:text-[13px]">
               Silver countries have films

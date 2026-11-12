@@ -79,6 +79,7 @@ layer for focus and labels) if any of these becomes true:
   works because they are buttons.
 - **Cap by camera-facing posters (M4):** today the cap takes the top-ranked films worldwide, so
   with real data the visible hemisphere could end up empty. Rank among camera-facing posters instead.
-- **Globe baseline on slow CPUs (M6):** ~23 fps at 4× throttle with no posters at all. Profile the
-  polygon layer (restyling on hover re-runs accessors for 177 countries), atmosphere and starfield.
+- **Globe baseline on slow CPUs (M6):** was ~23 fps at 4× throttle with no posters at all. Resolved
+  in [0003](0003-performance-pass.md): translucent double-sided country materials made three.js
+  re-check every country's shader twice a frame; opaque fills hold 60 fps at 4×.
 - The sprite renderer stays behind `?debug` for re-measuring; it is not a supported user path.

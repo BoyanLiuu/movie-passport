@@ -228,6 +228,13 @@
   transition: opacity 150ms ease;
 }
 
+/* Touch screens have no hover, so the title label would never show; leave it out entirely. */
+@media (pointer: coarse) {
+  .poster-label {
+    display: none;
+  }
+}
+
 /* Burnished: the poster comes up to full light. Hover, the selected film, the film pointed at
    from the list, and (preview) every poster of the country under the pointer. */
 .poster-anchor[data-hover] .poster,

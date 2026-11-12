@@ -317,7 +317,7 @@ const GlobeScene = ({
     return () => cancelAnimationFrame(frame);
   }, [targetX, targetY, reducedMotion]);
 
-  // Scene setup once the globe exists: first viewpoint, zoom limits, the night sky.
+  // Scene setup once the globe exists: first viewpoint, zoom limits.
   useEffect(() => {
     const globe = globeRef.current;
     if (!ready || !globe) return;
@@ -332,15 +332,32 @@ const GlobeScene = ({
     controls.maxDistance = radius * 5;
     controls.enablePan = false;
 
-    const sky = createNightSky();
-    globe.scene().add(sky.group);
-    const removeTestHook = installTestHook(globe);
-    return () => {
-      removeTestHook();
-      globe.scene().remove(sky.group);
-      sky.dispose();
-    };
+    return installTestHook(globe);
   }, [ready, handleZoom, aspect]);
+
+  // The night sky. Built in idle time after the globe is up: it is scenery, so it shouldn't hold up
+  // the first interaction.
+  useEffect(() => {
+    const globe = globeRef.current;
+    if (!ready || !globe) return;
+    let sky: ReturnType<typeof createNightSky> | null = null;
+    const build = () => {
+      sky = createNightSky();
+      globe.scene().add(sky.group);
+    };
+    const idle = typeof requestIdleCallback === "function";
+    const handle = idle
+      ? requestIdleCallback(build, { timeout: 2000 })
+      : window.setTimeout(build, 300);
+    return () => {
+      if (idle) cancelIdleCallback(handle);
+      else window.clearTimeout(handle);
+      if (sky) {
+        globe.scene().remove(sky.group);
+        sky.dispose();
+      }
+    };
+  }, [ready]);
 
   // Camera follows the focus target, or zooms back out when it is cleared.
   useEffect(() => {

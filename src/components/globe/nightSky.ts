@@ -105,7 +105,7 @@ const HAZE_ALPHA = 0.3;
  * sphere magnifies every texel into a visible grid). Soft shapes only; the fine grain comes from
  * the dust layer of points, sharp at any size.
  */
-const milkyWayTexture = (random: () => number, width = 1024, height = 512) => {
+const milkyWayTexture = (random: () => number, width = 512, height = 256) => {
   const haze = fractalNoise(random, 12, 5);
   const rifts = fractalNoise(random, 20, 4);
   const columns = Array.from({ length: width }, (_, x) => band((x + 0.5) / width));

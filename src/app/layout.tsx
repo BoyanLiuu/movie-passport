@@ -3,16 +3,18 @@ import { Cinzel, Spectral } from "next/font/google";
 import "./globals.css";
 
 // Engraved roman capitals for names and captions; a screen roman for reading. Both self-hosted
-// by next/font at build time (no request to Google from the browser).
+// by next/font at build time (no request to Google from the browser). Only the cuts in use:
+// Cinzel 400 and 500 (actions, the mark); Spectral 400 upright and italic, with latin-ext for
+// names such as Kieślowski.
 const cinzel = Cinzel({
   variable: "--font-cinzel",
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500"],
 });
 const spectral = Spectral({
   variable: "--font-spectral",
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600"],
+  weight: "400",
   style: ["normal", "italic"],
 });
 
