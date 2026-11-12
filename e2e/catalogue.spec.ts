@@ -83,7 +83,7 @@ test("the film card shows TMDB details, the plot, and a link back to TMDB", asyn
   await openGlobe(page, { catalogue: fixture, query: "/?film=194" });
   const card = page.getByTestId("movie-info");
   await expect(panel(page)).toHaveText("Amélie");
-  await expect(card).toContainText("2001 · 2 h 2 min · ★ 7.9");
+  await expect(card).toContainText("2001 · 2 h 2 min · 7.9 / 10");
   await expect(card).toContainText("Jean-Pierre Jeunet");
   await expect(page.getByTestId("movie-overview")).toContainText("shy waitress");
   await expect(card.getByRole("link", { name: /View on TMDB/ })).toHaveAttribute(

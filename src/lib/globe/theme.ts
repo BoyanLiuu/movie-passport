@@ -1,33 +1,37 @@
 // Look and feel of the globe layers. Kept free of three.js so it can be read anywhere.
 
 export const globeTheme = {
-  ocean: "#070d1c",
-  oceanEmissive: "#02040a",
-  oceanSpecular: "#1d2a44",
-  atmosphere: "#4f7cff",
-  atmosphereAltitude: 0.17,
+  // Velvet Night: the plate is rocked to black; only what has films is burnished back to light.
+  oceanEmissive: "#050505",
+  oceanSpecular: "#121110",
+  /** A faint warm rim so the sphere reads against the black, not a glow. */
+  atmosphere: "#5a4a3a",
+  atmosphereAltitude: 0.09,
 
-  land: "rgba(148, 163, 184, 0.16)",
-  /** Countries with films in the catalogue glow warmer, by count: 1, 2, 3+. */
+  /** Land with no films: dark plate, barely separated from the ocean. */
+  land: "rgba(42, 33, 25, 0.9)",
+  /** Countries with films, burnished by count: 1, 2, 3+. */
   landWithFilms: [
-    "rgba(253, 224, 140, 0.13)",
-    "rgba(253, 224, 140, 0.19)",
-    "rgba(253, 224, 140, 0.26)",
+    "rgba(167, 163, 154, 0.34)",
+    "rgba(167, 163, 154, 0.5)",
+    "rgba(190, 185, 177, 0.66)",
   ],
-  landDimmed: "rgba(148, 163, 184, 0.07)",
-  landHover: "rgba(251, 191, 36, 0.48)",
-  landSelected: "rgba(251, 191, 36, 0.82)",
-  side: "rgba(15, 23, 42, 0.55)",
-  sideSelected: "rgba(217, 119, 6, 0.6)",
-  stroke: "rgba(165, 180, 203, 0.42)",
-  strokeDimmed: "rgba(165, 180, 203, 0.2)",
-  strokeSelected: "rgba(254, 240, 138, 0.95)",
+  landDimmed: "rgba(42, 33, 25, 0.55)",
+  landHover: "rgba(219, 214, 209, 0.8)",
+  landSelected: "rgba(226, 221, 215, 0.9)",
+  /** A selected country with no films: half-scraped plate, never silver (silver means films). */
+  landSelectedEmpty: "rgba(90, 74, 58, 0.92)",
+  side: "rgba(11, 11, 11, 0.85)",
+  sideSelected: "rgba(167, 163, 154, 0.9)",
+  stroke: "rgba(167, 163, 154, 0.26)",
+  strokeDimmed: "rgba(167, 163, 154, 0.1)",
+  strokeSelected: "rgba(241, 237, 232, 1)",
 
   /** Polygon lift in globe radii: selected and hovered countries rise off the surface. */
   altitude: { base: 0.006, hover: 0.018, selected: 0.032, place: 0.016 },
   polygonTransitionMs: 260,
 
-  autoRotateSpeed: 0.35,
+  autoRotateSpeed: 0.3,
   /** How long the globe waits after the user lets go before it starts turning again. */
   idleResumeMs: 4000,
 } as const;

@@ -1,3 +1,5 @@
+import { panelFrame, plateButton } from "@/components/ui/plate";
+
 type GlobeStatusProps =
   { kind: "loading" } | { kind: "error"; title: string; detail?: string; onRetry?: () => void };
 
@@ -8,23 +10,22 @@ export const GlobeStatus = (props: GlobeStatusProps) => (
     role={props.kind === "error" ? "alert" : "status"}
   >
     {props.kind === "loading" ? (
-      <div className="flex flex-col items-center gap-4 text-slate-400">
+      <div className="flex flex-col items-center gap-6">
+        {/* The plate before it is burnished: a dark disc whose rim slowly catches the light. */}
         <span
           aria-hidden
-          className="size-16 rounded-full border border-slate-700 bg-[radial-gradient(circle_at_35%_30%,#1e293b,#020617)] shadow-[0_0_60px_-10px_#4f7cff] motion-safe:animate-pulse"
+          className="size-40 rounded-full border border-smoke bg-[radial-gradient(circle_at_40%_35%,#1d1915,#0b0b0b_72%)] shadow-[0_24px_60px_-20px_rgb(0_0_0/0.95)] motion-safe:animate-pulse"
         />
-        <span className="text-sm tracking-wide">Loading the globe…</span>
+        <span className="engraved text-[11px] text-pewter">Loading the globe</span>
       </div>
     ) : (
-      <div className="max-w-sm rounded-2xl border border-white/10 bg-slate-950/80 p-6 text-center backdrop-blur">
-        <p className="font-medium text-slate-100">{props.title}</p>
-        {props.detail && <p className="mt-2 text-sm text-slate-400">{props.detail}</p>}
+      <div className={`${panelFrame} max-w-sm p-7 text-center`}>
+        <p className="font-display text-lg tracking-[0.08em] text-silver-bright uppercase">
+          {props.title}
+        </p>
+        {props.detail && <p className="mt-3 font-serif text-[15px] text-pewter">{props.detail}</p>}
         {props.onRetry && (
-          <button
-            type="button"
-            onClick={props.onRetry}
-            className="mt-4 rounded-full bg-amber-400 px-4 py-2 text-sm font-medium text-slate-950 transition hover:bg-amber-300 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:outline-none"
-          >
+          <button type="button" onClick={props.onRetry} className={`${plateButton} mt-6`}>
             Try again
           </button>
         )}

@@ -4,6 +4,7 @@
 // arrow keys, Enter to go, Escape to close. "/" focuses it from anywhere. The canvas itself can't
 // be operated from the keyboard, so this is the keyboard route to every country.
 
+import { Search } from "lucide-react";
 import {
   type KeyboardEvent as ReactKeyboardEvent,
   useEffect,
@@ -135,10 +136,8 @@ export const SearchBox = ({
       <label htmlFor={inputId} className="sr-only">
         Search countries or films
       </label>
-      <div className="flex items-center gap-2 rounded-full border border-white/15 bg-slate-950/75 px-4 py-2.5 shadow-lg shadow-black/30 backdrop-blur-md focus-within:border-amber-300/60">
-        <svg aria-hidden viewBox="0 0 20 20" className="size-4 shrink-0 fill-slate-400">
-          <path d="M8.5 3a5.5 5.5 0 0 1 4.38 8.82l3.65 3.65-1.06 1.06-3.65-3.65A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" />
-        </svg>
+      <div className="flex min-h-11 items-center gap-3 border border-smoke bg-velvet-raised px-4 shadow-[0_12px_28px_-12px_rgb(0_0_0/0.9)] transition-colors focus-within:border-pewter">
+        <Search aria-hidden className="size-4 shrink-0 text-pewter" strokeWidth={1.5} />
         <input
           ref={inputRef}
           id={inputId}
@@ -160,9 +159,9 @@ export const SearchBox = ({
           onFocus={() => setOpen(true)}
           onBlur={() => setOpen(false)}
           onKeyDown={onKeyDown}
-          className="min-w-0 flex-1 bg-transparent text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none [&::-webkit-search-cancel-button]:hidden"
+          className="min-w-0 flex-1 bg-transparent py-2.5 font-serif text-[15px] text-silver-bright placeholder:text-pewter/80 placeholder:italic focus:outline-none [&::-webkit-search-cancel-button]:hidden"
         />
-        <kbd className="hidden rounded border border-white/15 px-1.5 text-[11px] text-slate-500 pointer-fine:inline">
+        <kbd className="hidden border border-smoke px-1.5 font-serif text-[11px] text-pewter pointer-fine:inline">
           /
         </kbd>
       </div>
@@ -172,19 +171,16 @@ export const SearchBox = ({
         role="listbox"
         aria-label="Search results"
         hidden={!expanded}
-        className="absolute inset-x-0 top-full mt-2 max-h-[min(24rem,60dvh)] overflow-y-auto rounded-2xl border border-white/10 bg-slate-950/95 p-2 shadow-2xl shadow-black/60 backdrop-blur-md"
+        className="absolute inset-x-0 top-full mt-2 max-h-[min(24rem,60dvh)] overflow-y-auto border border-smoke bg-velvet-raised p-1.5 shadow-[0_24px_48px_-16px_rgb(0_0_0/0.95)]"
       >
         {options.length === 0 ? (
-          <p className="px-3 py-2 text-sm text-slate-400" role="presentation">
+          <p className="px-3 py-2.5 font-serif text-sm text-pewter italic" role="presentation">
             No countries or films match “{query.trim()}”.
           </p>
         ) : (
           groups.map((group) => (
             <div key={group.name} role="group" aria-label={group.name}>
-              <p
-                className="px-3 pt-2 pb-1 text-[11px] tracking-wide text-slate-500 uppercase"
-                role="presentation"
-              >
+              <p className="engraved px-3 pt-3 pb-1.5 text-[10px] text-pewter" role="presentation">
                 {group.name}
               </p>
               {group.options.map((option) => {
@@ -201,10 +197,14 @@ export const SearchBox = ({
                       choose(option);
                     }}
                     onMouseEnter={() => setActive(i)}
-                    className="cursor-pointer rounded-lg px-3 py-2 aria-selected:bg-white/10"
+                    className="cursor-pointer px-3 py-2 aria-selected:bg-silver/10"
                   >
-                    <span className="block text-sm text-slate-100">{option.label}</span>
-                    <span className="block text-xs text-slate-400">{option.detail}</span>
+                    <span className="block font-serif text-[15px] text-silver-bright">
+                      {option.label}
+                    </span>
+                    <span className="block font-serif text-[13px] text-pewter">
+                      {option.detail}
+                    </span>
                   </div>
                 );
               })}

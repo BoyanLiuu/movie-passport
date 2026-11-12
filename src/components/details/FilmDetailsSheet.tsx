@@ -3,7 +3,10 @@
 // The film details sheet: rises from the bottom over the globe with what a TMDB film page shows
 // (in Movie Passport's own layout), plus links back into the globe. A native modal <dialog>, so
 // focus, Escape and screen readers behave; closing is navigation (the URL owns `&details`).
+// Velvet Night: the backdrop is printed as a dim mezzotint behind the title; the body reads as a
+// page with a hairline-ruled side column for the facts.
 
+import { ChevronDown, ExternalLink, Globe, Play, X } from "lucide-react";
 import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
@@ -12,12 +15,14 @@ import {
   useState,
 } from "react";
 import { fallBackToGeneratedArt, posterUrl } from "@/components/globe/posters/htmlPosters";
+import { engravedLabel, plateButton, plateChip } from "@/components/ui/plate";
 import type { Movie } from "@/data/movies";
 import { useFilmDetails } from "@/hooks/useFilmDetails";
 import {
   type FilmDetails,
   formatDate,
   formatMoney,
+  formatRuntime,
   justWatchUrl,
   languageName,
   preferredRegion,
@@ -43,27 +48,47 @@ type FilmDetailsSheetProps = {
 };
 
 const SectionTitle = ({ children }: { children: ReactNode }) => (
-  <h3 className="mb-3 text-xs font-medium tracking-[0.18em] text-slate-400 uppercase">
-    {children}
-  </h3>
+  <h3 className="engraved mb-4 text-[11px] text-pewter">{children}</h3>
 );
 
-const linkClass =
-  "text-amber-200 underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:outline-none";
-
 const External = ({ href, children }: { href: string; children: ReactNode }) => (
-  <a href={href} target="_blank" rel="noopener noreferrer" className={linkClass}>
+  <a
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-flex items-center gap-1.5 text-silver underline decoration-pewter/50 transition-colors hover:text-silver-bright hover:decoration-silver"
+  >
     {children}
+    <ExternalLink aria-hidden className="size-3.5 shrink-0" strokeWidth={1.5} />
   </a>
+);
+
+/** The plate's rule: a hairline with a small lozenge at its centre. */
+const Fleuron = () => (
+  <div aria-hidden className="flex items-center gap-3 px-6 sm:px-12">
+    <span className="h-px flex-1 bg-smoke" />
+    <span className="size-1.5 rotate-45 border border-pewter/70" />
+    <span className="h-px flex-1 bg-smoke" />
+  </div>
+);
+
+const Title = ({ movie }: { movie: Movie }) => (
+  <h2
+    id="details-title"
+    tabIndex={-1}
+    className="font-display text-[32px] leading-[1.1] tracking-[0.05em] text-balance text-silver-bright uppercase focus:outline-none sm:text-[44px]"
+  >
+    {movie.title} <span className="text-pewter">({movie.year})</span>
+  </h2>
 );
 
 const Trailer = ({ details, title }: { details: FilmDetails; title: string }) => {
   const [playing, setPlaying] = useState(false);
   if (!details.trailer) return null;
   return (
-    <section className="mt-8" data-testid="details-trailer">
+    <section data-testid="details-trailer">
       <SectionTitle>Trailer</SectionTitle>
-      <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-black ring-1 ring-white/10">
+      <div className="relative aspect-video w-full overflow-hidden border border-smoke bg-velvet-raised">
         {playing ? (
           <iframe
             src={trailerEmbedUrl(details.trailer.key)}
@@ -77,7 +102,7 @@ const Trailer = ({ details, title }: { details: FilmDetails; title: string }) =>
           <button
             type="button"
             onClick={() => setPlaying(true)}
-            className="group absolute inset-0 flex items-center justify-center focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:outline-none"
+            className="group absolute inset-0 flex items-center justify-center focus-visible:outline-offset-[-4px]"
           >
             {details.backdrop && (
               // eslint-disable-next-line @next/next/no-img-element -- TMDB CDN
@@ -85,11 +110,12 @@ const Trailer = ({ details, title }: { details: FilmDetails; title: string }) =>
                 src={tmdbImage(details.backdrop, "w780")}
                 alt=""
                 loading="lazy"
-                className="absolute inset-0 h-full w-full object-cover opacity-60 transition group-hover:opacity-80"
+                className="absolute inset-0 h-full w-full object-cover opacity-40 grayscale transition-[opacity,filter] duration-300 group-hover:opacity-70 group-hover:grayscale-0"
               />
             )}
-            <span className="relative flex items-center gap-2 rounded-full bg-slate-950/80 px-5 py-3 text-sm font-medium text-slate-50">
-              <span aria-hidden>▶</span> Play trailer
+            <span className={`${plateButton} relative`}>
+              <Play aria-hidden className="size-3.5 fill-current" strokeWidth={1.5} />
+              Play trailer
             </span>
           </button>
         )}
@@ -107,38 +133,47 @@ const WhereToWatch = ({ details, title }: { details: FilmDetails; title: string 
   );
   const entry = region ? details.watch[region] : undefined;
   return (
-    <section className="mt-8" data-testid="details-watch">
+    <section data-testid="details-watch">
       <SectionTitle>Where to watch</SectionTitle>
       {regions.length === 0 || !region ? (
-        <p className="text-sm text-slate-400">No streaming, rental or purchase options listed.</p>
+        <p className="font-serif text-[15px] text-pewter italic">
+          No streaming, rental or purchase options listed.
+        </p>
       ) : (
         <>
-          <label className="flex items-center gap-2 text-sm text-slate-300">
-            In
-            <select
-              value={region}
-              onChange={(e) => setRegion(e.target.value)}
-              className="rounded-lg border border-white/15 bg-slate-900 px-2 py-1 text-slate-100"
-            >
-              {regions.map((r) => (
-                <option key={r} value={r}>
-                  {regionName(r)}
-                </option>
-              ))}
-            </select>
+          <label className="flex flex-col gap-2">
+            <span className={engravedLabel}>Region</span>
+            <span className="relative">
+              <select
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
+                className="min-h-10 w-full appearance-none border border-pewter/40 bg-velvet-raised pr-9 pl-3 font-serif text-[15px] text-silver-bright transition-colors hover:border-silver"
+              >
+                {regions.map((r) => (
+                  <option key={r} value={r}>
+                    {regionName(r)}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                aria-hidden
+                className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-pewter"
+                strokeWidth={1.5}
+              />
+            </span>
           </label>
-          <div className="mt-4 space-y-4">
+          <div className="mt-5 space-y-5">
             {PROVIDER_GROUPS.map(({ key, label }) => {
               const providers = entry?.[key];
               if (!providers?.length) return null;
               return (
                 <div key={key}>
-                  <p className="text-xs text-slate-500">{label}</p>
-                  <ul className="mt-2 flex flex-wrap gap-2">
+                  <p className={engravedLabel}>{label}</p>
+                  <ul className="mt-2.5 flex flex-wrap gap-2">
                     {providers.map((p) => (
                       <li
                         key={p.id}
-                        className="flex items-center gap-2 rounded-lg bg-white/5 py-1 pr-3 pl-1 text-sm text-slate-200"
+                        className="flex items-center gap-2.5 border border-smoke py-1 pr-3 pl-1 font-serif text-sm text-silver"
                       >
                         {p.logo && (
                           // eslint-disable-next-line @next/next/no-img-element -- TMDB CDN
@@ -146,7 +181,7 @@ const WhereToWatch = ({ details, title }: { details: FilmDetails; title: string 
                             src={tmdbImage(p.logo, "w92")}
                             alt=""
                             loading="lazy"
-                            className="size-7 rounded"
+                            className="size-7"
                           />
                         )}
                         {p.name}
@@ -160,9 +195,9 @@ const WhereToWatch = ({ details, title }: { details: FilmDetails; title: string 
         </>
       )}
       {/* TMDB's terms: watch-provider data must be credited to JustWatch. */}
-      <p className="mt-4 text-xs text-slate-500" data-testid="justwatch-credit">
+      <p className="mt-5 font-serif text-[13px] text-pewter" data-testid="justwatch-credit">
         Data from JustWatch ·{" "}
-        <External href={justWatchUrl(region ?? "US", title)}>See on JustWatch ↗</External>
+        <External href={justWatchUrl(region ?? "US", title)}>See on JustWatch</External>
       </p>
     </section>
   );
@@ -182,7 +217,7 @@ const PosterRow = ({
     href?: string;
   }[];
 }) => (
-  <ul aria-label={label} className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2">
+  <ul aria-label={label} className="-mx-1 flex gap-4 overflow-x-auto px-1 pt-1 pb-3">
     {items.map((item) => {
       const body = (
         <>
@@ -191,14 +226,19 @@ const PosterRow = ({
             src={item.src}
             alt=""
             loading="lazy"
-            className="aspect-[2/3] w-28 rounded-lg bg-slate-800 object-cover ring-1 ring-white/10"
+            className="aspect-[2/3] w-28 border border-silver/25 bg-plate-deep object-cover shadow-[0_10px_20px_-8px_rgb(0_0_0/0.95)] brightness-[0.82] saturate-[0.85] transition-[filter,border-color] duration-200 group-hover:border-silver-bright/80 group-hover:brightness-100 group-hover:saturate-100 group-focus-visible:brightness-100"
           />
-          <span className="mt-1.5 block truncate text-sm text-slate-200">{item.title}</span>
-          {item.year && <span className="block text-xs text-slate-500">{item.year}</span>}
+          <span className="mt-2 block truncate font-serif text-sm text-silver transition-colors group-hover:text-silver-bright">
+            {item.title}
+          </span>
+          {item.year && (
+            <span className="block font-serif text-[13px] text-pewter tabular-nums">
+              {item.year}
+            </span>
+          )}
         </>
       );
-      const className =
-        "block w-28 rounded-lg text-left focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:outline-none";
+      const className = "group block w-28 text-left";
       return (
         <li key={item.key} className="shrink-0">
           {item.onOpen ? (
@@ -266,82 +306,83 @@ const Body = ({
     },
     details.links.twitter && { label: "X", href: `https://x.com/${details.links.twitter}` },
   ].filter(Boolean) as { label: string; href: string }[];
+  const headerFacts = [
+    details.releaseDate ? formatDate(details.releaseDate) : String(movie.year),
+    movie.genres?.length ? movie.genres.join(", ") : null,
+    movie.runtime ? formatRuntime(movie.runtime) : null,
+  ].filter(Boolean);
 
   return (
     <>
       {/* Header: backdrop behind poster, title and key facts. */}
       <header className="relative overflow-hidden">
         {details.backdrop && (
+          // A still from the film, printed dim and colourless into the plate behind the title.
           // eslint-disable-next-line @next/next/no-img-element -- TMDB CDN
           <img
             src={tmdbImage(details.backdrop, "w1280")}
             alt=""
-            className="absolute inset-0 h-full w-full object-cover opacity-30"
+            className="absolute inset-0 h-full w-full object-cover opacity-[0.22] grayscale"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/30" />
-        <div className="relative flex flex-col gap-6 px-6 pt-10 pb-6 sm:flex-row sm:px-10">
+        <div className="absolute inset-0 bg-gradient-to-t from-velvet via-velvet/85 to-velvet/40" />
+        <div className="relative flex flex-col gap-7 px-6 pt-8 pb-10 sm:flex-row sm:gap-10 sm:px-12 sm:pt-10">
           {/* eslint-disable-next-line @next/next/no-img-element -- TMDB CDN or generated art */}
           <img
             src={posterUrl(movie, "w342")}
             onError={(e) => fallBackToGeneratedArt(e.currentTarget, movie)}
             alt=""
-            className="aspect-[2/3] w-36 shrink-0 self-start rounded-xl bg-slate-800 object-cover shadow-2xl ring-1 ring-white/15 sm:w-52"
+            className="aspect-[2/3] w-36 shrink-0 self-start border border-silver/30 bg-plate-deep object-cover shadow-[0_24px_40px_-14px_rgb(0_0_0/0.95)] sm:w-52"
           />
           <div className="min-w-0">
-            <h2
-              id="details-title"
-              className="font-display text-4xl leading-tight text-slate-50 sm:text-5xl"
-            >
-              {movie.title} <span className="text-slate-400">({movie.year})</span>
-            </h2>
+            <Title movie={movie} />
             {movie.originalTitle && (
-              <p className="mt-1 text-sm text-slate-400">{movie.originalTitle}</p>
+              <p className="mt-2 font-serif text-base text-pewter italic">{movie.originalTitle}</p>
             )}
-            <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-300">
+            <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 font-serif text-[15px] text-silver tabular-nums">
               {certification && (
-                <span className="rounded border border-white/30 px-1.5 text-xs">
+                <span className="border border-pewter/50 px-1.5 text-[12px] leading-5 text-silver">
                   {certification}
                 </span>
               )}
-              {details.releaseDate && <span>{formatDate(details.releaseDate)}</span>}
-              {movie.genres?.length ? <span>{movie.genres.join(", ")}</span> : null}
-              {movie.runtime ? (
-                <span>
-                  {Math.floor(movie.runtime / 60)}h {movie.runtime % 60}m
-                </span>
-              ) : null}
+              <span>{headerFacts.join(" · ")}</span>
             </p>
             {movie.rating ? (
-              <p className="mt-3 text-sm text-slate-300" data-testid="details-score">
-                <span className="text-2xl font-semibold text-amber-300">
-                  {Math.round(movie.rating * 10)}%
-                </span>{" "}
-                user score · {movie.rank.toLocaleString("en-GB")} votes on TMDB
+              <p
+                className="mt-2 font-serif text-[15px] text-pewter tabular-nums"
+                data-testid="details-score"
+              >
+                <span className="text-silver-bright">{Math.round(movie.rating * 10)}%</span> user
+                score · {movie.rank.toLocaleString("en-GB")} votes on TMDB
               </p>
             ) : null}
             {details.tagline && (
-              <p className="mt-4 text-slate-300 italic" data-testid="details-tagline">
+              <p
+                className="mt-5 font-serif text-lg text-silver italic"
+                data-testid="details-tagline"
+              >
                 {details.tagline}
               </p>
             )}
             {details.overview && (
               <>
-                <h3 className="mt-4 text-sm font-medium text-slate-100">Overview</h3>
-                <p className="mt-1 max-w-prose text-sm leading-relaxed text-slate-300">
+                <h3 className={`${engravedLabel} mt-6`}>Overview</h3>
+                <p className="mt-2 max-w-[62ch] font-serif text-base leading-relaxed text-silver">
                   {details.overview}
                 </p>
               </>
             )}
             {(details.directors.length > 0 || details.writers.length > 0) && (
               <dl
-                className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3"
+                className="mt-6 grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-3"
                 data-testid="details-crew"
               >
                 {keyCrew(details).map((person) => (
-                  <div key={person.name}>
-                    <dt className="text-sm font-medium text-slate-100">{person.name}</dt>
-                    <dd className="text-xs text-slate-400">{person.jobs.join(", ")}</dd>
+                  <div key={person.name} className="min-w-0">
+                    <dt className="font-serif text-[15px] text-silver-bright">{person.name}</dt>
+                    <dd className="font-serif text-[13px] text-pewter italic">
+                      {person.jobs.join(", ")}
+                    </dd>
                   </div>
                 ))}
               </dl>
@@ -350,139 +391,160 @@ const Body = ({
         </div>
       </header>
 
-      <div className="px-6 pb-10 sm:px-10">
-        {details.cast.length > 0 && (
-          <section className="mt-6" data-testid="details-cast">
-            <SectionTitle>Top billed cast</SectionTitle>
-            <ul className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2">
-              {details.cast.map((person) => (
-                <li key={`${person.name}-${person.character}`} className="w-28 shrink-0">
-                  {person.photo ? (
-                    // eslint-disable-next-line @next/next/no-img-element -- TMDB CDN
-                    <img
-                      src={tmdbImage(person.photo, "w185")}
-                      alt=""
-                      loading="lazy"
-                      className="aspect-[2/3] w-full rounded-lg bg-slate-800 object-cover ring-1 ring-white/10"
-                    />
-                  ) : (
-                    <div className="flex aspect-[2/3] w-full items-center justify-center rounded-lg bg-slate-800 text-2xl text-slate-500">
-                      {person.name.charAt(0)}
-                    </div>
-                  )}
-                  <p className="mt-1.5 truncate text-sm font-medium text-slate-100">
-                    {person.name}
-                  </p>
-                  {person.character && (
-                    <p className="truncate text-xs text-slate-400">{person.character}</p>
-                  )}
-                </li>
+      <Fleuron />
+
+      <div className="px-6 pt-8 pb-12 sm:px-12 lg:grid lg:grid-cols-[minmax(0,1fr)_17rem] lg:gap-x-12">
+        <div className="min-w-0 space-y-10">
+          {details.cast.length > 0 && (
+            <section data-testid="details-cast">
+              <SectionTitle>Top billed cast</SectionTitle>
+              <ul className="-mx-1 flex gap-4 overflow-x-auto px-1 pb-3">
+                {details.cast.map((person) => (
+                  <li key={`${person.name}-${person.character}`} className="group w-28 shrink-0">
+                    {person.photo ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- TMDB CDN
+                      <img
+                        src={tmdbImage(person.photo, "w185")}
+                        alt=""
+                        loading="lazy"
+                        className="aspect-[2/3] w-full border border-silver/20 bg-plate-deep object-cover opacity-80 grayscale transition-[opacity,filter] duration-300 group-hover:opacity-100 group-hover:grayscale-0"
+                      />
+                    ) : (
+                      <div className="flex aspect-[2/3] w-full items-center justify-center border border-smoke bg-plate-deep font-display text-2xl text-pewter">
+                        {person.name.charAt(0)}
+                      </div>
+                    )}
+                    <p className="mt-2 truncate font-serif text-sm text-silver-bright">
+                      {person.name}
+                    </p>
+                    {person.character && (
+                      <p className="truncate font-serif text-[13px] text-pewter italic">
+                        {person.character}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          <Trailer details={details} title={movie.title} />
+
+          {moreFromHome.length > 0 && homeName && (
+            <section>
+              <SectionTitle>More from {homeName}</SectionTitle>
+              <PosterRow
+                label={`More from ${homeName}`}
+                items={moreFromHome.map((m) => ({
+                  key: m.id,
+                  title: m.title,
+                  year: m.year,
+                  src: posterUrl(m, "w185"),
+                  onOpen: () => onOpenFilm(m.id),
+                }))}
+              />
+            </section>
+          )}
+
+          {details.recommendations.length > 0 && (
+            <section>
+              <SectionTitle>Similar films</SectionTitle>
+              <PosterRow
+                label="Similar films"
+                items={details.recommendations.map((r) => ({
+                  key: r.id,
+                  title: r.title,
+                  year: r.year,
+                  src: r.poster
+                    ? tmdbImage(r.poster, "w185")
+                    : posterUrl({ ...movie, id: r.id, title: r.title, poster: null }),
+                  ...(catalogueIds.has(r.id)
+                    ? { onOpen: () => onOpenFilm(r.id) }
+                    : { href: `https://www.themoviedb.org/movie/${r.id}` }),
+                }))}
+              />
+            </section>
+          )}
+        </div>
+
+        {/* The side column: a hairline-ruled margin of facts, like the plate's printed key. */}
+        <aside className="mt-10 space-y-10 border-t border-smoke pt-8 lg:mt-0 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-10">
+          <WhereToWatch details={details} title={movie.title} />
+
+          <section>
+            <SectionTitle>Facts</SectionTitle>
+            <dl
+              className="grid grid-cols-2 gap-x-6 gap-y-4 lg:grid-cols-1"
+              data-testid="details-facts"
+            >
+              {facts.map(([label, value]) => (
+                <div key={label} className="min-w-0">
+                  <dt className={engravedLabel}>{label}</dt>
+                  <dd className="mt-1 font-serif text-[15px] text-silver-bright tabular-nums">
+                    {value}
+                  </dd>
+                </div>
               ))}
-            </ul>
+            </dl>
           </section>
-        )}
 
-        <Trailer details={details} title={movie.title} />
-        <WhereToWatch details={details} title={movie.title} />
-
-        <section className="mt-8">
-          <SectionTitle>Facts</SectionTitle>
-          <dl
-            className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-3"
-            data-testid="details-facts"
-          >
-            {facts.map(([label, value]) => (
-              <div key={label}>
-                <dt className="text-xs text-slate-500">{label}</dt>
-                <dd className="text-sm text-slate-100">{value}</dd>
-              </div>
-            ))}
-          </dl>
           {countries.length > 0 && (
-            <>
-              <p className="mt-5 text-xs text-slate-500">
-                Production countries — show on the globe
-              </p>
-              <ul className="mt-2 flex flex-wrap gap-2">
+            <section>
+              <SectionTitle>Production countries</SectionTitle>
+              <ul className="flex flex-wrap gap-2">
                 {countries.map((c) => (
                   <li key={c.id}>
                     <button
                       type="button"
                       onClick={() => onSelectCountry(c.id)}
-                      className="rounded-full border border-amber-300/40 bg-amber-300/10 px-3 py-1 text-sm text-amber-100 transition hover:bg-amber-300/20 focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:outline-none"
+                      className={plateChip}
                     >
-                      🌍 {c.name}
+                      <Globe aria-hidden className="size-3.5" strokeWidth={1.5} />
+                      {c.name}
                     </button>
                   </li>
                 ))}
               </ul>
-            </>
+              <p className="mt-2.5 font-serif text-[13px] text-pewter italic">
+                Each opens on the globe.
+              </p>
+            </section>
           )}
-        </section>
 
-        {moreFromHome.length > 0 && homeName && (
-          <section className="mt-8">
-            <SectionTitle>More from {homeName}</SectionTitle>
-            <PosterRow
-              label={`More from ${homeName}`}
-              items={moreFromHome.map((m) => ({
-                key: m.id,
-                title: m.title,
-                year: m.year,
-                src: posterUrl(m, "w185"),
-                onOpen: () => onOpenFilm(m.id),
-              }))}
-            />
-          </section>
-        )}
+          {details.keywords.length > 0 && (
+            <section>
+              <SectionTitle>Keywords</SectionTitle>
+              <ul
+                className="flex flex-wrap gap-x-2 gap-y-1 font-serif text-sm text-pewter italic"
+                data-testid="details-keywords"
+              >
+                {details.keywords.map((k) => (
+                  <li
+                    key={k}
+                    className="after:ml-2 after:text-smoke after:not-italic after:content-['·'] last:after:content-none"
+                  >
+                    {k}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
 
-        {details.recommendations.length > 0 && (
-          <section className="mt-8">
-            <SectionTitle>Similar films</SectionTitle>
-            <PosterRow
-              label="Similar films"
-              items={details.recommendations.map((r) => ({
-                key: r.id,
-                title: r.title,
-                year: r.year,
-                src: r.poster
-                  ? tmdbImage(r.poster, "w185")
-                  : posterUrl({ ...movie, id: r.id, title: r.title, poster: null }),
-                ...(catalogueIds.has(r.id)
-                  ? { onOpen: () => onOpenFilm(r.id) }
-                  : { href: `https://www.themoviedb.org/movie/${r.id}` }),
-              }))}
-            />
-          </section>
-        )}
+          {links.length > 0 && (
+            <section>
+              <SectionTitle>Links</SectionTitle>
+              <ul className="flex flex-wrap gap-x-5 gap-y-2.5 font-serif text-[15px] lg:flex-col">
+                {links.map((l) => (
+                  <li key={l.label}>
+                    <External href={l.href}>{l.label}</External>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </aside>
 
-        {details.keywords.length > 0 && (
-          <section className="mt-8">
-            <SectionTitle>Keywords</SectionTitle>
-            <ul className="flex flex-wrap gap-2" data-testid="details-keywords">
-              {details.keywords.map((k) => (
-                <li key={k} className="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-300">
-                  {k}
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        {links.length > 0 && (
-          <section className="mt-8">
-            <SectionTitle>Links</SectionTitle>
-            <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
-              {links.map((l) => (
-                <li key={l.label}>
-                  <External href={l.href}>{l.label} ↗</External>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        <p className="mt-10 text-xs text-slate-500">
+        <p className="mt-12 border-t border-smoke pt-5 font-serif text-[13px] text-pewter italic lg:col-span-2">
           Film data and images from TMDB. This product uses the TMDB API but is not endorsed or
           certified by TMDB. Streaming data from JustWatch.
         </p>
@@ -502,7 +564,11 @@ export const FilmDetailsSheet = (props: FilmDetailsSheetProps) => {
 
   useEffect(() => {
     const el = dialog.current;
-    if (el && !el.open) el.showModal();
+    if (el && !el.open) {
+      el.showModal();
+      // Start on the title (read out first), not the close button the browser would pick.
+      el.querySelector<HTMLElement>("#details-title")?.focus();
+    }
     return () => el?.close();
   }, []);
 
@@ -530,7 +596,7 @@ export const FilmDetailsSheet = (props: FilmDetailsSheetProps) => {
       onClick={(e) => e.target === e.currentTarget && onClose()}
       style={drag ? { transform: `translateY(${drag.dy}px)`, transition: "none" } : undefined}
       // pointer-events-auto: the overlay it sits in ignores the pointer (so the globe drags).
-      className="details-sheet pointer-events-auto fixed inset-x-0 top-auto bottom-0 mx-auto mb-0 h-[94dvh] max-h-none w-full max-w-5xl overflow-hidden rounded-t-3xl border border-b-0 border-white/10 bg-slate-950 p-0 text-slate-200 shadow-2xl backdrop:bg-black/60 sm:h-[90dvh]"
+      className="details-sheet velvet-grain pointer-events-auto fixed inset-x-0 top-auto bottom-0 mx-auto mb-0 h-[94dvh] max-h-none w-full max-w-5xl overflow-hidden border border-b-0 border-smoke bg-velvet p-0 text-silver shadow-[0_-24px_60px_-24px_rgb(0_0_0/0.95)] backdrop:bg-black/75 sm:h-[90dvh]"
     >
       <div className="flex h-full flex-col">
         <div
@@ -541,15 +607,15 @@ export const FilmDetailsSheet = (props: FilmDetailsSheetProps) => {
           onPointerCancel={() => setDrag(null)}
           aria-hidden
         >
-          <span className="h-1.5 w-12 rounded-full bg-white/25" />
+          <span className="h-0.5 w-14 bg-pewter/40" />
         </div>
         <button
           type="button"
           onClick={onClose}
           aria-label="Close details"
-          className="absolute top-3 right-4 z-10 flex size-9 items-center justify-center rounded-full bg-slate-900/80 text-lg text-slate-200 ring-1 ring-white/15 transition hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:outline-none"
+          className="absolute top-3 right-4 z-10 flex size-10 items-center justify-center border border-pewter/40 bg-velvet/80 text-silver transition-colors hover:border-silver hover:text-silver-bright"
         >
-          ✕
+          <X aria-hidden className="size-4" strokeWidth={1.5} />
         </button>
 
         <div
@@ -559,11 +625,9 @@ export const FilmDetailsSheet = (props: FilmDetailsSheetProps) => {
           {state.status === "ready" ? (
             <Body {...props} details={state.details} />
           ) : (
-            <div className="px-6 pt-6 sm:px-10">
-              <h2 id="details-title" className="font-display text-4xl text-slate-50">
-                {movie.title} <span className="text-slate-400">({movie.year})</span>
-              </h2>
-              <p className="mt-4 text-sm text-slate-400" role="status">
+            <div className="px-6 pt-8 sm:px-12 sm:pt-10">
+              <Title movie={movie} />
+              <p className="mt-4 font-serif text-[15px] text-pewter italic" role="status">
                 {state.status === "loading"
                   ? "Loading details…"
                   : "Details aren’t available for this film yet. Run `pnpm data:catalogue` to fetch them."}

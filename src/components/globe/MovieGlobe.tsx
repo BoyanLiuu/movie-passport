@@ -30,7 +30,9 @@ import {
 } from "@/lib/navigation";
 import { stressPosters } from "@/lib/movies/posters";
 import { FilmDetailsSheet } from "@/components/details/FilmDetailsSheet";
+import { panelFrame } from "@/components/ui/plate";
 import { CountryInfo } from "./CountryInfo";
+import { PlateGauge } from "./PlateGauge";
 import { GlobeErrorBoundary } from "./GlobeErrorBoundary";
 import { GlobeStatus } from "./GlobeStatus";
 import { MovieInfo } from "./MovieInfo";
@@ -213,6 +215,25 @@ export const MovieGlobe = () => {
     [selectedMovie, catalogueMovies],
   );
   const catalogueIds = useMemo(() => new Set(catalogueMovies.map((m) => m.id)), [catalogueMovies]);
+  const homeCountry = selectedMovie ? (countryByIso2.get(selectedMovie.home) ?? null) : null;
+
+  // Light follows attention: the plate brightens faintly under the pointer (CSS: .attention-light).
+  useEffect(() => {
+    let frame = 0;
+    const onMove = (event: PointerEvent) => {
+      if (frame || event.pointerType !== "mouse") return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        document.documentElement.style.setProperty("--mx", `${event.clientX}px`);
+        document.documentElement.style.setProperty("--my", `${event.clientY}px`);
+      });
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      cancelAnimationFrame(frame);
+    };
+  }, []);
   const reset = useCallback(() => go(GLOBAL_MODE), [go]);
   const dismissNotFound = useCallback(
     () => navigateToSearch(searchWithoutSelection(window.location.search), { replace: true }),
@@ -280,11 +301,22 @@ export const MovieGlobe = () => {
         </GlobeErrorBoundary>
       )}
 
+      <div aria-hidden className="attention-light pointer-events-none absolute inset-0" />
+
       {/* Overlay: the wrapper ignores the pointer so the globe stays draggable underneath. */}
       <div className="pointer-events-none absolute inset-0">
-        <header className="absolute top-5 left-5 sm:top-6 sm:left-6">
-          <h1 className="font-display text-3xl text-slate-50 sm:text-4xl">Movie Passport</h1>
-          <p className="mt-1 text-sm text-slate-400">Travel the world through films.</p>
+        {/* Phones: a velvet band behind the mark and search, so prints never cross them. */}
+        <div
+          aria-hidden
+          className="absolute inset-x-0 top-0 h-56 bg-[linear-gradient(to_bottom,var(--color-velvet)_0%,var(--color-velvet)_70%,transparent_100%)] sm:hidden"
+        />
+        <header className="absolute top-5 left-5 sm:top-7 sm:left-7">
+          <h1 className="font-display text-[19px] font-medium tracking-[0.34em] text-silver-bright uppercase sm:text-[22px]">
+            Movie Passport
+          </h1>
+          <p className="mt-1.5 font-serif text-[15px] text-pewter italic">
+            Travel the world through films.
+          </p>
           {catalogue.status === "ready" && (
             <AboutDialog
               source={catalogue.source}
@@ -297,7 +329,7 @@ export const MovieGlobe = () => {
         {state.status === "ready" && (
           <div
             ref={setTopOverlay}
-            className="absolute inset-x-3 top-28 sm:inset-x-auto sm:top-32 sm:left-6 sm:w-96 lg:top-6 lg:left-1/2 lg:-translate-x-1/2"
+            className="absolute inset-x-3 top-32 sm:inset-x-auto sm:left-6 sm:w-96 lg:top-6 lg:left-1/2 lg:-translate-x-1/2"
           >
             <SearchBox
               countries={countries}
@@ -317,7 +349,7 @@ export const MovieGlobe = () => {
               <p
                 role="status"
                 data-testid="not-found"
-                className="pointer-events-auto mt-2 flex items-center justify-between gap-3 rounded-xl border border-amber-300/30 bg-slate-950/85 px-4 py-2 text-sm text-slate-200 backdrop-blur"
+                className={`${panelFrame} pointer-events-auto mt-2 flex items-center justify-between gap-3 px-4 py-2.5 font-serif text-sm text-silver`}
               >
                 <span>
                   No {notFound.param === "film" ? "film" : "country"} matches “{notFound.value}”.
@@ -326,7 +358,7 @@ export const MovieGlobe = () => {
                 <button
                   type="button"
                   onClick={dismissNotFound}
-                  className="shrink-0 text-amber-200 underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:outline-none"
+                  className="engraved min-h-9 shrink-0 px-2 text-[10px] text-silver-bright underline decoration-pewter/60 hover:decoration-silver"
                 >
                   Dismiss
                 </button>
@@ -368,16 +400,34 @@ export const MovieGlobe = () => {
             onReset={reset}
           />
         )}
+        {/* The engraved caption on the plate's lower margin: what to do next. */}
         {mode.kind === "global" && state.status === "ready" && (
-          <p className="absolute inset-x-0 bottom-6 text-center text-xs tracking-wide text-slate-500">
-            <span className="pointer-coarse:hidden">
-              Drag to rotate · Scroll to zoom · Click a country or a poster
-            </span>
-            <span className="hidden pointer-coarse:inline">
-              Drag to rotate · Pinch to zoom · Tap a country or a poster
-            </span>
-            <span className="mt-1 block text-slate-600">Warmer countries have films</span>
-          </p>
+          <div className="absolute inset-x-0 bottom-6 px-6 text-center sm:bottom-8">
+            <p className="engraved text-[12px] text-silver sm:text-[13px]">
+              Silver countries have films
+            </p>
+            <p className="mt-2 font-serif text-[14px] text-pewter italic">
+              <span className="pointer-coarse:hidden">
+                Drag to rotate · Scroll to zoom · Click a country or a poster
+              </span>
+              <span className="hidden pointer-coarse:inline">
+                Drag to rotate · Pinch to zoom · Tap a country or a poster
+              </span>
+            </p>
+          </div>
+        )}
+
+        {ready && (
+          <PlateGauge
+            depth={detailsOpen ? 3 : selectedMovie ? 2 : selectedCountry ? 1 : 0}
+            countryName={
+              selectedCountry?.name ?? (selectedMovie ? homeCountry?.name : null) ?? null
+            }
+            filmTitle={selectedMovie?.title ?? null}
+            onWorld={reset}
+            onCountry={homeCountry ? () => selectCountry(homeCountry.id) : undefined}
+            onFilm={detailsOpen ? closeDetails : undefined}
+          />
         )}
 
         {detailsOpen && selectedMovie && (

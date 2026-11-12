@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { MOCK_MOVIES } from "@/data/movies";
-import { countryAt, parseCountries } from "@/lib/geo/countries";
+import { angularDistance, countryAt, parseCountries } from "@/lib/geo/countries";
 import {
   escapeXml,
   hashString,
@@ -15,6 +15,7 @@ import {
   MAX_RENDERED_POSTERS,
   posterLimit,
   posterWidth,
+  printSpacing,
   stressPosters,
   horizonDegrees,
   posterSeparation,
@@ -91,6 +92,16 @@ describe("poster visibility", () => {
     expect(posterWidth(0.01)).toBe(88);
   });
 
+  it("spaces zoomed-in prints about one poster height apart", () => {
+    for (const altitude of [0.3, 0.5, 0.8]) {
+      // Degrees a poster covers on a 900 px tall view (≈ altitude / 16.8 degrees per pixel).
+      const posterArc = (1.5 * posterWidth(altitude) * altitude) / 16.8;
+      const gap = posterSeparation(altitude, printSpacing(altitude));
+      expect(gap).toBeGreaterThan(posterArc * 0.9);
+      expect(gap).toBeLessThan(posterArc * 1.2);
+    }
+  });
+
   it("shows fewer posters when zoomed out", () => {
     expect(posterLimit(2.4)).toBe(12);
     expect(posterLimit(1.2)).toBe(16);
@@ -148,6 +159,23 @@ describe("poster visibility", () => {
       always: new Set(["leviathan"]),
     });
     expect(ids(withSelected)).toEqual([...ids(shown), "leviathan"]);
+  });
+
+  it("keeps other posters clear of an always-rendered one", () => {
+    const amelie = MOCK_MOVIES.find((m) => m.id === "amelie")!;
+    const shown = selectPosters(MOCK_MOVIES, {
+      limit: 20,
+      center: null,
+      altitude: 2.5,
+      always: new Set(["amelie"]),
+    });
+    expect(ids(shown).at(-1)).toBe("amelie");
+    const separation = posterSeparation(2.5);
+    for (const m of shown.slice(0, -1)) {
+      expect(angularDistance(m.lat, m.lng, amelie.lat, amelie.lng)).toBeGreaterThanOrEqual(
+        separation,
+      );
+    }
   });
 
   it("builds reproducible stress sets that start with the real films", () => {

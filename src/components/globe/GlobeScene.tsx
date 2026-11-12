@@ -28,14 +28,16 @@ import { filmCountLabel } from "@/lib/catalogue";
 import { countryTooltipHtml, globeTheme as theme, landColorFor } from "@/lib/globe/theme";
 import { angularDistance } from "@/lib/geo/countries";
 import {
+  FILM_VIEW_POSTERS,
   MAX_RENDERED_POSTERS,
   posterLimit,
   posterWidth,
+  printSpacing,
   selectPosters,
 } from "@/lib/movies/posters";
 import { createPosterElement, posterAt, setPosterVisibility } from "./posters/htmlPosters";
 import { createSpritePosters, type SpritePosters } from "./posters/spritePosters";
-import { createStarfield } from "./starfield";
+import { createPlateTexture } from "./plateTexture";
 import { installTestHook } from "./testHook";
 
 export type PosterRenderer = "html" | "sprites";
@@ -117,17 +119,25 @@ const GlobeScene = ({
     return width > 0 && height > 0 ? width / height : 16 / 9;
   }, []);
 
+  // The rocked plate: velvet grain under a soft Phong shading, so the sphere still reads as a sphere.
   const globeMaterial = useMemo(
     () =>
       new MeshPhongMaterial({
-        color: theme.ocean,
+        map: createPlateTexture(),
+        color: "#ffffff",
         emissive: theme.oceanEmissive,
         specular: theme.oceanSpecular,
-        shininess: 14,
+        shininess: 3,
       }),
     [],
   );
-  useEffect(() => () => globeMaterial.dispose(), [globeMaterial]);
+  useEffect(
+    () => () => {
+      globeMaterial.map?.dispose();
+      globeMaterial.dispose();
+    },
+    [globeMaterial],
+  );
 
   const highlightKey = highlightedIds.join(",");
   const highlighted = useMemo(
@@ -150,11 +160,10 @@ const GlobeScene = ({
     () => (focusKey === null ? null : new Set(focusKey ? focusKey.split(",") : [])),
     [focusKey],
   );
-  // The capped global set, plus the focused country's films. Posters outside the focus stay
-  // rendered but faded out (data-out), so they can animate out and back in.
   // The capped, spaced set for the current view. In country view, the country's own films are
-  // chosen the same way (best first, at most MAX_RENDERED_POSTERS); the global set stays rendered
-  // but faded out (data-out) so posters animate both ways.
+  // chosen the same way (best first, spaced so no print covers another); the global set stays
+  // rendered but faded out (data-out) so posters animate both ways. In film view, only a few
+  // spaced prints stay around the selected one, so the film remains the subject.
   const shownPosters = useMemo(() => {
     const altitude = posterView?.altitude ?? initialView().altitude;
     const always = new Set(selectedMovieId ? [selectedMovieId] : []);
@@ -166,12 +175,15 @@ const GlobeScene = ({
         always,
         spacing,
       });
+    if (!focusSet && selectedMovieId) {
+      return pick(movies, FILM_VIEW_POSTERS, printSpacing(altitude));
+    }
     const global = pick(movies, posterLimit(altitude));
     if (!focusSet) return global;
     const local = pick(
       movies.filter((m) => focusSet.has(m.id)),
       MAX_RENDERED_POSTERS,
-      2.5,
+      printSpacing(altitude),
     );
     const ids = new Set(local.map((m) => m.id));
     return [...local, ...global.filter((m) => !ids.has(m.id))];
@@ -236,13 +248,21 @@ const GlobeScene = ({
     return anchor;
   }, []);
 
+  // Preview before commit: hovering a country brings all of its posters up to full light.
+  const homeById = useMemo(() => new Map(movies.map((m) => [m.id, m.home])), [movies]);
+  const previewHome = useMemo(
+    () => (hoveredId ? (countries.find((c) => c.id === hoveredId)?.iso2 ?? null) : null),
+    [hoveredId, countries],
+  );
+
   useEffect(() => {
     for (const [id, anchor] of anchors.current) {
       anchor.toggleAttribute("data-selected", id === selectedMovieId);
       anchor.toggleAttribute("data-linked", id === linkedMovieId);
       anchor.toggleAttribute("data-out", !!focusSet && !focusSet.has(id));
+      anchor.toggleAttribute("data-preview", !!previewHome && homeById.get(id) === previewHome);
     }
-  }, [selectedMovieId, linkedMovieId, focusSet, shownPosters]);
+  }, [selectedMovieId, linkedMovieId, focusSet, shownPosters, previewHome, homeById]);
 
   useEffect(() => {
     if (!ready) return;
@@ -296,7 +316,7 @@ const GlobeScene = ({
     return () => cancelAnimationFrame(frame);
   }, [targetX, targetY, reducedMotion]);
 
-  // Scene setup once the globe exists: first viewpoint, zoom limits, starfield.
+  // Scene setup once the globe exists: first viewpoint, zoom limits.
   useEffect(() => {
     const globe = globeRef.current;
     if (!ready || !globe) return;
@@ -311,14 +331,7 @@ const GlobeScene = ({
     controls.maxDistance = radius * 5;
     controls.enablePan = false;
 
-    const { stars, dispose } = createStarfield();
-    globe.scene().add(stars);
-    const removeTestHook = installTestHook(globe);
-    return () => {
-      removeTestHook();
-      globe.scene().remove(stars);
-      dispose();
-    };
+    return installTestHook(globe);
   }, [ready, handleZoom, aspect]);
 
   // Camera follows the focus target, or zooms back out when it is cleared.
@@ -381,15 +394,20 @@ const GlobeScene = ({
   const capColor = useCallback(
     (d: object) => {
       const { id } = asCountry(d);
-      if (highlighted.has(id)) return theme.landSelected;
+      if (highlighted.has(id)) {
+        return (filmCounts.get(id) ?? 0) > 0 ? theme.landSelected : theme.landSelectedEmpty;
+      }
       if (id === hoveredCountryId) return theme.landHover;
       return highlighted.size > 0 ? theme.landDimmed : landColorFor(filmCounts.get(id) ?? 0);
     },
     [highlighted, hoveredCountryId, filmCounts],
   );
   const sideColor = useCallback(
-    (d: object) => (highlighted.has(asCountry(d).id) ? theme.sideSelected : theme.side),
-    [highlighted],
+    (d: object) => {
+      const { id } = asCountry(d);
+      return highlighted.has(id) && (filmCounts.get(id) ?? 0) > 0 ? theme.sideSelected : theme.side;
+    },
+    [highlighted, filmCounts],
   );
   const strokeColor = useCallback(
     (d: object) => {

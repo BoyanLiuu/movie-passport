@@ -1,0 +1,385 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-12T01:17:16+00:00",
+  "title": "Design System: Movie Passport",
+  "extensions": {
+    "colorMeta": {
+      "silver-bright": {
+        "role": "primary",
+        "displayName": "Burnished Silver Bright",
+        "tonalRamp": [
+          "#0c0b09",
+          "#272522",
+          "#44413e",
+          "#64615d",
+          "#85827d",
+          "#a7a4a1",
+          "#cbc9c5",
+          "#f0eeeb"
+        ]
+      },
+      "silver": {
+        "role": "primary",
+        "displayName": "Burnished Silver",
+        "tonalRamp": [
+          "#0d0b09",
+          "#272522",
+          "#45413e",
+          "#64605c",
+          "#86817d",
+          "#a8a4a0",
+          "#ccc8c5",
+          "#f1eeeb"
+        ]
+      },
+      "pewter": {
+        "role": "secondary",
+        "displayName": "Pewter",
+        "tonalRamp": [
+          "#0d0b08",
+          "#272520",
+          "#44423b",
+          "#646159",
+          "#86827a",
+          "#a8a59d",
+          "#ccc9c2",
+          "#f1eee9"
+        ]
+      },
+      "plate": {
+        "role": "tertiary",
+        "displayName": "Half-Scraped Plate",
+        "tonalRamp": [
+          "#110a04",
+          "#2d2319",
+          "#4c3f33",
+          "#6e5e4f",
+          "#907f6f",
+          "#b1a294",
+          "#d4c7ba",
+          "#f7ece2"
+        ]
+      },
+      "plate-deep": {
+        "role": "tertiary",
+        "displayName": "Dark Plate",
+        "tonalRamp": [
+          "#0f0a07",
+          "#2a241e",
+          "#484039",
+          "#695f56",
+          "#8b8077",
+          "#ada39b",
+          "#d0c7c0",
+          "#f4ede7"
+        ]
+      },
+      "smoke": {
+        "role": "neutral",
+        "displayName": "Smoke",
+        "tonalRamp": [
+          "#0c0b0a",
+          "#262523",
+          "#43423f",
+          "#63615e",
+          "#84827f",
+          "#a7a5a2",
+          "#cac9c6",
+          "#f0eeec"
+        ]
+      },
+      "velvet-raised": {
+        "role": "neutral",
+        "displayName": "Raised Velvet",
+        "tonalRamp": [
+          "#0c0b0a",
+          "#262524",
+          "#434241",
+          "#626160",
+          "#838281",
+          "#a6a5a4",
+          "#cac9c8",
+          "#efeeed"
+        ]
+      },
+      "velvet": {
+        "role": "neutral",
+        "displayName": "Rocked Velvet",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252525",
+          "#424242",
+          "#616161",
+          "#828282",
+          "#a5a5a5",
+          "#c9c9c9",
+          "#eeeeee"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Film title in the details sheet."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Country name in the country panel."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Film title on the film card; error titles."
+      },
+      "mark": {
+        "displayName": "Mark",
+        "purpose": "The Movie Passport wordmark only."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Reading text: overviews, list titles, dialog text."
+      },
+      "body-small": {
+        "displayName": "Body Small",
+        "purpose": "Metadata, credits, roles; often italic pewter."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Engraved labels: section headings, stats, form labels, gauge levels."
+      },
+      "label-action": {
+        "displayName": "Label Action",
+        "purpose": "Text inside buttons and chips."
+      }
+    },
+    "shadows": [
+      {
+        "name": "panel",
+        "value": "0 24px 48px -16px rgb(0 0 0 / 0.9)",
+        "purpose": "Country and film panels; search dropdown at 0.95."
+      },
+      {
+        "name": "dialog",
+        "value": "0 32px 64px -20px rgb(0 0 0 / 0.95)",
+        "purpose": "About dialog. The details sheet casts 0 -24px 60px -24px rgb(0 0 0 / 0.95) upward."
+      },
+      {
+        "name": "control",
+        "value": "0 12px 28px -12px rgb(0 0 0 / 0.9)",
+        "purpose": "Search field. The plate button uses 0 8px 18px -8px rgb(0 0 0 / 0.95)."
+      },
+      {
+        "name": "tooltip",
+        "value": "0 10px 24px -8px rgb(0 0 0 / 0.9)",
+        "purpose": "Globe tooltip."
+      },
+      {
+        "name": "print",
+        "value": "0 10px 22px -6px rgb(0 0 0 / 0.9)",
+        "purpose": "Posters on the globe at rest."
+      },
+      {
+        "name": "print-selected",
+        "value": "0 14px 28px -6px rgb(0 0 0 / 0.95)",
+        "purpose": "The selected poster."
+      },
+      {
+        "name": "pin-knockout",
+        "value": "0 0 0 2px var(--color-velvet)",
+        "purpose": "A velvet ring that knocks the poster pin out of the plate; a cut, not a shadow."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-burnish",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Panels rising in (360ms, 10px) and prints scaling or surfacing (180ms, 320ms)."
+      },
+      {
+        "name": "ease-sheet",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Details sheet rising from the bottom (380ms); reduced motion fades over 160ms."
+      },
+      {
+        "name": "duration-hover",
+        "value": "150ms",
+        "purpose": "Colour and brightness changes on buttons, chips and rows."
+      },
+      {
+        "name": "duration-country",
+        "value": "260ms",
+        "purpose": "Globe polygon colour and altitude transitions."
+      },
+      {
+        "name": "poster-light",
+        "value": "rest brightness(0.82) saturate(0.85); film view others brightness(0.5) saturate(0.6); attended none",
+        "purpose": "The Light Follows Attention Rule."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Plate Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one burnished primary action in a view.",
+      "html": "<button class=\"ds-btn-plate\">More details <svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button>",
+      "css": ".ds-btn-plate { font-family: var(--font-display, 'Cinzel', 'Trajan Pro', Georgia, serif); letter-spacing: 0.22em; text-transform: uppercase; display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 10px; padding: 0 20px; font-size: 11px; font-weight: 500; color: var(--color-velvet, #0b0b0b); background: linear-gradient(180deg, #ebe6e0 0%, #bdb8b0 100%); border: 1px solid rgb(241 237 232 / 0.7); border-radius: 0; box-shadow: 0 8px 18px -8px rgb(0 0 0 / 0.95); cursor: pointer; transition: filter 150ms, transform 150ms; } .ds-btn-plate:hover { filter: brightness(1.1); } .ds-btn-plate:active { transform: translateY(1px); } .ds-btn-plate:focus-visible { outline: 1px solid var(--color-silver-bright, #f1ede8); outline-offset: 3px; }"
+    },
+    {
+      "name": "Hairline Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Secondary actions, such as Back to globe.",
+      "html": "<button class=\"ds-btn-hairline\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m12 19-7-7 7-7\"/><path d=\"M19 12H5\"/></svg> Back to globe <kbd class=\"ds-kbd\">Esc</kbd></button>",
+      "css": ".ds-btn-hairline { font-family: var(--font-display, 'Cinzel', 'Trajan Pro', Georgia, serif); letter-spacing: 0.22em; text-transform: uppercase; display: inline-flex; min-height: 44px; align-items: center; justify-content: center; gap: 10px; padding: 0 20px; font-size: 11px; color: var(--color-silver, #dbd6d1); background: transparent; border: 1px solid rgb(167 163 154 / 0.5); border-radius: 0; cursor: pointer; transition: color 150ms, border-color 150ms, background-color 150ms; } .ds-btn-hairline:hover { border-color: var(--color-silver, #dbd6d1); background: rgb(219 214 209 / 0.05); color: var(--color-silver-bright, #f1ede8); } .ds-btn-hairline:focus-visible { outline: 1px solid var(--color-silver-bright, #f1ede8); outline-offset: 3px; } .ds-kbd { font-family: var(--font-serif, 'Spectral', Georgia, serif); margin-left: 4px; border: 1px solid var(--color-smoke, #3c3a37); padding: 2px 6px; font-size: 10px; letter-spacing: normal; text-transform: none; color: var(--color-pewter, #a7a39a); }"
+    },
+    {
+      "name": "Country Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Country links on the film card, empty state and details side column.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\">France</button><button class=\"ds-chip\">Germany</button></div>",
+      "css": ".ds-chips { display: flex; flex-wrap: wrap; gap: 8px; } .ds-chip { font-family: var(--font-display, 'Cinzel', 'Trajan Pro', Georgia, serif); letter-spacing: 0.22em; text-transform: uppercase; display: inline-flex; min-height: 40px; align-items: center; gap: 8px; padding: 0 14px; font-size: 11px; color: var(--color-silver, #dbd6d1); background: transparent; border: 1px solid rgb(167 163 154 / 0.4); border-radius: 0; cursor: pointer; transition: color 150ms, border-color 150ms, background-color 150ms; } .ds-chip:hover { border-color: var(--color-silver, #dbd6d1); background: rgb(219 214 209 / 0.05); color: var(--color-silver-bright, #f1ede8); } .ds-chip:focus-visible { outline: 1px solid var(--color-silver-bright, #f1ede8); outline-offset: 3px; }"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "search-field",
+      "description": "Top-centre search for countries and films.",
+      "html": "<label class=\"ds-search\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/></svg><input type=\"search\" placeholder=\"Search countries or films\" aria-label=\"Search countries or films\"><kbd>/</kbd></label>",
+      "css": ".ds-search { display: flex; min-height: 44px; width: 384px; max-width: 100%; align-items: center; gap: 12px; padding: 0 16px; background: var(--color-velvet-raised, #121110); border: 1px solid var(--color-smoke, #3c3a37); box-shadow: 0 12px 28px -12px rgb(0 0 0 / 0.9); color: var(--color-pewter, #a7a39a); transition: border-color 150ms; } .ds-search:focus-within { border-color: var(--color-pewter, #a7a39a); } .ds-search input { font-family: var(--font-serif, 'Spectral', Georgia, serif); flex: 1; min-width: 0; padding: 10px 0; font-size: 15px; color: var(--color-silver-bright, #f1ede8); background: transparent; border: 0; outline: none; } .ds-search input::placeholder { color: rgb(167 163 154 / 0.8); font-style: italic; } .ds-search kbd { font-family: var(--font-serif, 'Spectral', Georgia, serif); border: 1px solid var(--color-smoke, #3c3a37); padding: 0 6px; font-size: 11px; }"
+    },
+    {
+      "name": "Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Country or film panel printed onto the plate.",
+      "html": "<section class=\"ds-panel\"><h2>France</h2><p class=\"ds-label\">Europe · Plate FR</p><dl><div><dt class=\"ds-label\">From here</dt><dd>10</dd></div><div><dt class=\"ds-label\">Co-produced</dt><dd>24</dd></div><div><dt class=\"ds-label\">Decades</dt><dd>1950s–2020s</dd></div></dl></section>",
+      "css": ".ds-panel { width: 24rem; max-width: 100%; padding: 24px; background: rgb(18 17 16 / 0.95); border: 1px solid var(--color-smoke, #3c3a37); border-radius: 0; box-shadow: 0 24px 48px -16px rgb(0 0 0 / 0.9); color: var(--color-silver, #dbd6d1); } .ds-panel h2 { font-family: var(--font-display, 'Cinzel', serif); margin: 0; font-size: 32px; font-weight: 400; line-height: 1.25; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-silver-bright, #f1ede8); } .ds-label { font-family: var(--font-display, 'Cinzel', 'Trajan Pro', Georgia, serif); letter-spacing: 0.22em; text-transform: uppercase; margin: 8px 0 0; font-size: 10px; color: var(--color-pewter, #a7a39a); } .ds-panel dl { display: grid; grid-template-columns: repeat(3, auto); justify-content: space-between; gap: 16px; margin: 20px 0 0; padding-top: 16px; border-top: 1px solid var(--color-smoke, #3c3a37); } .ds-panel dt { margin: 0; } .ds-panel dd { font-family: var(--font-serif, 'Spectral', Georgia, serif); margin: 4px 0 0; font-size: 18px; font-variant-numeric: tabular-nums; color: var(--color-silver-bright, #f1ede8); }"
+    },
+    {
+      "name": "Plate Gauge",
+      "kind": "nav",
+      "description": "Depth as navigation: World, Country, Film, Details.",
+      "html": "<nav class=\"ds-gauge\" aria-label=\"Depth\"><ol><li class=\"is-past\"><button><span class=\"dot\"></span><span class=\"lvl\">World</span></button></li><li class=\"is-current\" aria-current=\"step\"><span class=\"dot\"></span><span class=\"lvl\">Country</span><span class=\"det\">France</span></li><li><span class=\"dot\"></span><span class=\"lvl\">Film</span></li><li><span class=\"dot\"></span><span class=\"lvl\">Details</span></li></ol></nav>",
+      "css": ".ds-gauge ol { position: relative; display: flex; flex-direction: column; gap: 28px; margin: 0; padding: 0 0 0 20px; list-style: none; border-left: 1px solid var(--color-smoke, #3c3a37); } .ds-gauge li { position: relative; } .ds-gauge button { all: unset; cursor: pointer; } .ds-gauge .dot { position: absolute; top: 4px; left: -25px; width: 8px; height: 8px; border-radius: 9999px; box-sizing: border-box; border: 1px solid rgb(167 163 154 / 0.4); background: var(--color-velvet, #0b0b0b); } .ds-gauge .lvl { font-family: var(--font-display, 'Cinzel', 'Trajan Pro', Georgia, serif); letter-spacing: 0.22em; text-transform: uppercase; display: block; font-size: 10px; color: rgb(167 163 154 / 0.5); } .ds-gauge .det { font-family: var(--font-serif, 'Spectral', Georgia, serif); display: block; margin-top: 2px; font-size: 12px; font-style: italic; color: var(--color-pewter, #a7a39a); } .ds-gauge .is-past .dot { border: 0; background: var(--color-pewter, #a7a39a); } .ds-gauge .is-past .lvl { color: var(--color-pewter, #a7a39a); } .ds-gauge .is-past button:hover .lvl { color: var(--color-silver-bright, #f1ede8); } .ds-gauge .is-current .dot { border: 0; background: var(--color-silver-bright, #f1ede8); } .ds-gauge .is-current .lvl { color: var(--color-silver-bright, #f1ede8); }"
+    },
+    {
+      "name": "Poster Print",
+      "kind": "custom",
+      "refersTo": "poster-print",
+      "description": "A film standing on its country as a small framed print on a burnished pin.",
+      "html": "<div class=\"ds-print-row\"><div class=\"ds-print\"><div class=\"img\"></div><span class=\"pin\"></span></div><div class=\"ds-print is-lit\"><div class=\"img\"></div><span class=\"pin\"></span></div></div>",
+      "css": ".ds-print-row { display: flex; gap: 32px; padding: 24px; background: var(--color-velvet, #0b0b0b); } .ds-print { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; } .ds-print .img { width: 36px; aspect-ratio: 2 / 3; background: linear-gradient(160deg, #5a4a3a, #2a2119); border: 1px solid rgb(219 214 209 / 0.35); border-radius: 1px; box-shadow: 0 10px 22px -6px rgb(0 0 0 / 0.9); filter: brightness(0.82) saturate(0.85); transform-origin: 50% 100%; transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), filter 180ms ease, border-color 180ms ease; } .ds-print .pin { width: 5px; height: 5px; border-radius: 9999px; background: var(--color-silver, #dbd6d1); box-shadow: 0 0 0 2px var(--color-velvet, #0b0b0b); } .ds-print:hover .img, .ds-print.is-lit .img { filter: none; border-color: rgb(241 237 232 / 0.85); transform: scale(1.14); }"
+    },
+    {
+      "name": "Fleuron Rule",
+      "kind": "custom",
+      "description": "Closes the details sheet header: hairlines meeting a drawn open diamond.",
+      "html": "<div class=\"ds-fleuron\" aria-hidden=\"true\"><span class=\"line\"></span><span class=\"lozenge\"></span><span class=\"line\"></span></div>",
+      "css": ".ds-fleuron { display: flex; align-items: center; gap: 12px; padding: 0 48px; } .ds-fleuron .line { height: 1px; flex: 1; background: var(--color-smoke, #3c3a37); } .ds-fleuron .lozenge { width: 6px; height: 6px; transform: rotate(45deg); border: 1px solid rgb(167 163 154 / 0.7); }"
+    },
+    {
+      "name": "Globe Tooltip",
+      "kind": "custom",
+      "refersTo": "globe-tooltip",
+      "description": "Hover tooltip naming a country on the globe.",
+      "html": "<div class=\"ds-tooltip\"><strong>Japan</strong><span>Asia</span><em>10 films</em></div>",
+      "css": ".ds-tooltip { display: inline-flex; flex-direction: column; gap: 3px; padding: 10px 14px; border: 1px solid var(--color-smoke, #3c3a37); background: var(--color-velvet-raised, #121110); box-shadow: 0 10px 24px -8px rgb(0 0 0 / 0.9); } .ds-tooltip strong { font: 500 14px/1.2 var(--font-display, 'Cinzel', serif); letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-silver-bright, #f1ede8); } .ds-tooltip span { font: italic 13px/1.3 var(--font-serif, 'Spectral', serif); color: var(--color-pewter, #a7a39a); } .ds-tooltip em { font: 13px/1.3 var(--font-serif, 'Spectral', serif); font-style: normal; font-variant-numeric: tabular-nums; color: var(--color-silver, #dbd6d1); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Velvet Night",
+    "overview": "The whole product is a mezzotint plate. A mezzotint begins rocked to an even velvet black, and the image exists only where the engraver burnishes the burr back down so it catches light. Movie Passport works the same way: the page, the ocean and every land without films sit in the rocked black, and only what holds cinema (countries with films, the posters standing on them, the thing under the viewer's attention) is burnished up through pewter to silver. Cinema is light pulled out of a dark room; the interface never adds light that does not mean something.\n\nThe material is warm, quiet and printed. Panels are the same black lifted a shade and framed by a single hairline, as if printed onto the plate rather than floating above it. Type is engraved: widely tracked roman capitals for names, captions and labels, a screen roman for anything read at length. Corners are square, there is no glass, no blur and no glow; depth comes from offset shadows falling into the black and from brightness, never from translucency. Density is low: the globe stays large at the centre and every overlay keeps to an edge.\n\nThe world refuses the category default of a navy space globe with a glowing atmosphere, neon accents and floating rounded poster cards, and refuses the streaming-service look.",
+    "keyCharacteristics": [
+      "Velvet black ground with a fine warm burr of grain over everything.",
+      "Silver is the only light; brightness carries meaning (films, selection, attention).",
+      "Warm plate brown marks half-scraped states: hover borders, empty selections, dark land.",
+      "Engraved Cinzel capitals for names, captions and labels; Spectral for reading.",
+      "Square corners, single hairline frames, offset drop shadows, no glass or blur.",
+      "Lucide line icons at a 1.5 stroke; one burnished plate button per view."
+    ],
+    "rules": [
+      {
+        "name": "The Silver Means Films Rule",
+        "body": "On the globe, silver is reserved for countries that have films. A selected country with no films is filled with half-scraped plate and outlined in a silver-bright stroke; it is never filled silver.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Light Rule",
+        "body": "There is no accent hue. Emphasis is made by burnishing (velvet, plate, pewter, silver, silver-bright), not by colour. Only film imagery brings colour into the view.",
+        "section": "colors"
+      },
+      {
+        "name": "The Engraved Capitals Rule",
+        "body": "Names, captions, labels and actions are set in Cinzel capitals with wide tracking; anything read as a sentence is Spectral. Never set running text in Cinzel, and never set a label in Spectral caps.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Kicker Rule",
+        "body": "No eyebrow or kicker sits above a heading. An engraved label either is the section heading or sits below a name as its caption (continent and plate code under a country).",
+        "section": "typography"
+      },
+      {
+        "name": "The Print Spacing Rule",
+        "body": "Posters on the globe keep about one poster height apart on screen when zoomed in, so no print covers another. Zoomed out, only the best-ranked prints show (12 at the global view, 16 closer, never more than 60), and in film view only about 10 prints stay for context.",
+        "section": "layout"
+      },
+      {
+        "name": "The Offset Shadow Rule",
+        "body": "Every shadow is offset downward and falls into the black. No zero-offset glows, no coloured shadows, no glass, no backdrop blur; modal backdrops are plain black at 75%.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Light Follows Attention Rule",
+        "body": "Posters rest at brightness 0.82 and saturation 0.85, and come to full light on hover, keyboard focus, when pointed at from a list, when selected, or when their country is previewed. In film view every print except the selected or attended one sinks to brightness 0.5. On fine pointers a faint 420px silver radial follows the cursor over the plate. New prints surface out of the dark (from brightness 0.2).",
+        "section": "elevation"
+      },
+      {
+        "name": "The Fleuron Rule",
+        "body": "The details sheet header is closed by a fleuron rule: two smoke hairlines meeting a small open diamond (a 6px square, rotated 45 degrees, pewter outline). It is drawn, never typed as a glyph.",
+        "section": "shapes"
+      },
+      {
+        "name": "The One Plate Rule",
+        "body": "A view has at most one burnished plate button: \"More details\" on the film card, \"Play trailer\" in the details sheet, \"Close\" in About, \"Try again\" on an error. Every other action is a hairline button, a chip or a text link.",
+        "section": "components"
+      },
+      {
+        "name": "The Attribution Rule",
+        "body": "Source credit is part of the design: the TMDB logo and notice in About, a \"View on TMDB\" link on the film card, JustWatch credited directly under where-to-watch, Natural Earth credited for the map. Credits are set in 13px Spectral pewter with silver underlined links; they are never hidden or removed.",
+        "section": "components"
+      }
+    ],
+    "dos": [
+      "Do let brightness carry meaning: velvet for nothing, plate for half-worked, pewter for half-lit, silver for films and selection, silver-bright for the one live thing.",
+      "Do fill a selected empty country with half-scraped plate and outline it in silver-bright.",
+      "Do keep one burnished plate button per view and make every other action a hairline button, chip or link.",
+      "Do set names, captions and labels in engraved Cinzel capitals with wide tracking, and reading text in Spectral.",
+      "Do rest posters at brightness 0.82 and bring them to full light on hover, link, selection or country preview; dim the rest to 0.5 in film view.",
+      "Do keep prints about one poster height apart when zoomed in.",
+      "Do use lucide icons at strokeWidth 1.5, sized 14px to 16px.",
+      "Do keep TMDB and JustWatch attribution visible wherever their data appears.",
+      "Do respect reduced motion: panels, prints and the sheet appear without slides."
+    ],
+    "donts": [
+      "Don't fill a country silver unless it has films.",
+      "Don't round corners on panels, buttons, chips, fields or dialogs; only pins, gauge dots and the loading disc are round.",
+      "Don't use glass, backdrop blur, glow or zero-offset shadows; every shadow is offset downward.",
+      "Don't introduce an accent hue, neon, or a navy space-globe atmosphere.",
+      "Don't place an eyebrow or kicker above a heading.",
+      "Don't use Unicode glyphs as icons or ornaments; use lucide for icons and draw rules and fleurons. The middle dot as a text separator is punctuation, not an icon, and stays.",
+      "Don't set running text in Cinzel or in capitals."
+    ]
+  }
+}

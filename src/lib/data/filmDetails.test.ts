@@ -3,6 +3,7 @@ import {
   detailsUrl,
   formatDate,
   formatMoney,
+  formatRuntime,
   justWatchUrl,
   languageName,
   parseFilmDetails,
@@ -63,5 +64,7 @@ describe("helpers", () => {
     expect(languageName("fr")).toBe("French");
     expect(regionName("GB")).toBe("United Kingdom");
     expect(formatDate("2001-04-25")).toBe("25 April 2001");
+    expect(formatRuntime(122)).toBe("2 h 2 min");
+    expect(formatRuntime(48)).toBe("48 min");
   });
 });

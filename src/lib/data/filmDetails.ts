@@ -132,6 +132,10 @@ const displayName = (type: "language" | "region", code: string) => {
 export const languageName = (code: string) => displayName("language", code);
 export const regionName = (code: string) => displayName("region", code);
 
+/** "2 h 2 min", or "48 min" under an hour. */
+export const formatRuntime = (minutes: number) =>
+  minutes >= 60 ? `${Math.floor(minutes / 60)} h ${minutes % 60} min` : `${minutes} min`;
+
 export const formatDate = (iso: string) =>
   new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", {
     day: "numeric",

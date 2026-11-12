@@ -11,9 +11,9 @@ How to read this: `[x]` done and verified, `[ ]` not yet. Each milestone is done
 | M3 — Mode A ↔ B                | ✅ Done | Country view lists its films; URL sync; search                      |
 | M4 — Real movie data           | ✅ Done | 1,171 real films from TMDB, incl. Hong Kong, USSR…                  |
 | M5 — Film details sheet        | ✅ Done | "More details" opens a full film page over the globe (UX to refine) |
-| M6 — Polish & ship             | ⚪ Next | Deployed site, a11y and performance budgets met                     |
+| M6 — Polish & ship             | 🟡 Now  | Velvet Night redesign done; deploy, a11y and perf budgets remain    |
 
-**Last verified:** 2026-11-11 — `pnpm check` green (lint, typecheck, 107 unit tests, build);
+**Last verified:** 2026-11-11, after the Velvet Night redesign — `pnpm check` green (lint, typecheck, 109 unit tests, build);
 `pnpm test:e2e` 108 passed, 6 skipped (mouse-only tests on the phone project), desktop Chrome + Pixel 7
 emulation. The TMDB token appears in no build output, no public file and no tracked file.
 
@@ -174,6 +174,15 @@ Worth a manual look:
 
 ## M6 — Polish & ship (optional)
 
+- [x] Visual redesign, "Velvet Night" (mezzotint): velvet-black plate, burnished-silver countries
+      with films, posters as framed prints, Cinzel + Spectral, hairline panels; chosen over four
+      direction rounds (see `PRODUCT.md`, `DESIGN.md`, `.impeccable/surfaces/`)
+- [x] Depth gauge (World → Country → Film → Details) on the left edge; levels above are links back
+- [x] Hovering a country brings its posters up to full light (preview)
+- [x] Details sheet re-laid as a page with a side column for where-to-watch, facts and links
+- [x] Drawn icons (lucide) replace text glyphs; one runtime format ("2 h 2 min") everywhere
+- [x] Uncluttered zoom: country prints spaced about one poster height apart; film view keeps ten
+      prints and dims all but the selected one
 - [ ] Frame-time budget with the full poster set; globe baseline on slow CPUs (~23 fps at 4×)
 - [ ] Draggable country sheet on phones (peek / expanded)
 - [ ] axe accessibility checks in Playwright

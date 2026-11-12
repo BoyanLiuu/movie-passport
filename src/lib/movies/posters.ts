@@ -34,11 +34,14 @@ export type PosterSelection = {
   /** What the camera looks at; null skips the facing test (e.g. before the first frame). */
   center: { lat: number; lng: number } | null;
   altitude: number;
-  /** Always rendered, e.g. the selected film. */
+  /** Always rendered, e.g. the selected film; other posters keep their distance from it. */
   always?: ReadonlySet<string>;
   /** Spacing between pins relative to the default (smaller in country view, to show more). */
   spacing?: number;
 };
+
+/** Prints kept on the globe around a selected film: enough for context, few enough to stay quiet. */
+export const FILM_VIEW_POSTERS = 10;
 
 /**
  * Minimum arc between two poster pins, like map labels: wide when zoomed out (about 11° at the
@@ -46,6 +49,14 @@ export type PosterSelection = {
  */
 export const posterSeparation = (altitude: number, scale = 4.5) =>
   Math.min(14, Math.max(1, altitude * scale));
+
+/**
+ * Spacing (for `selectPosters`) that keeps whole prints apart when zoomed in: pins about one
+ * poster height apart on screen, so no print covers another. Posters keep a fixed pixel size, so
+ * the arc they cover shrinks with altitude: about altitude / 16.8 degrees per pixel on a 900 px
+ * tall view with the globe's 50° field of view, and a poster is 1.5 times as tall as it is wide.
+ */
+export const printSpacing = (altitude: number) => 0.085 * posterWidth(altitude);
 
 /**
  * The posters to render. Only films on the side of the globe facing the camera count towards the
@@ -69,21 +80,20 @@ export const selectPosters = (
     byCountry.set(key, list);
   }
   const separation = posterSeparation(altitude, spacing);
+  // Always-rendered films (the selected one) come last but hold their place: others keep clear.
+  const kept = always?.size ? movies.filter((m) => always.has(m.id)) : [];
   const shown: Movie[] = [];
   const tooClose = (m: Movie) =>
-    shown.some((s) => angularDistance(s.lat, s.lng, m.lat, m.lng) < separation);
+    [...shown, ...kept].some((s) => angularDistance(s.lat, s.lng, m.lat, m.lng) < separation);
   for (let round = 0; shown.length < limit; round++) {
     const tier = [...byCountry.values()].flatMap((list) => list[round] ?? []).sort(byRank);
     if (tier.length === 0) break;
     for (const movie of tier) {
       if (shown.length >= limit) break;
-      if (!tooClose(movie)) shown.push(movie);
+      if (!always?.has(movie.id) && !tooClose(movie)) shown.push(movie);
     }
   }
-
-  if (!always?.size) return shown;
-  const ids = new Set(shown.map((m) => m.id));
-  return [...shown, ...movies.filter((m) => always.has(m.id) && !ids.has(m.id))];
+  return [...shown, ...kept];
 };
 
 /** Deterministic pseudo-random numbers (mulberry32), so stress layouts are reproducible. */
