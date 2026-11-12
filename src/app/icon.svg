@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Movie Passport: the velvet plate, a globe with its land burnished to silver, and one framed
+       print standing on it. Square corners, like everything else in the app. -->
+  <defs>
+    <radialGradient id="sphere" cx="0.38" cy="0.34" r="0.78">
+      <stop offset="0" stop-color="#2a2622" />
+      <stop offset="1" stop-color="#0e0d0c" />
+    </radialGradient>
+    <clipPath id="globe">
+      <circle cx="30" cy="35" r="23" />
+    </clipPath>
+  </defs>
+  <rect width="64" height="64" fill="#0b0b0b" />
+  <circle cx="30" cy="35" r="23" fill="url(#sphere)" />
+  <g clip-path="url(#globe)" fill="#a7a39a">
+    <!-- the Americas, at the limb -->
+    <path d="M9 24c4-3 9-2 10 3s-2 7-3 11 1 9 0 14c-4-3-7-9-8-15z" />
+    <!-- Europe and Africa -->
+    <path d="M25 27C28 24 33 22 37 23C40 23 41 25 38 27C35 28 30 29 25 27Z" />
+    <path d="M27 33C30 31 35 31 38 32L41 35C43 35 44 37 42 39C40 41 39 44 37 47C36 50 34 53 32 54C31 50 31 47 29 44C27 42 24 40 24 37C24 35 25 34 27 33Z" />
+  </g>
+  <circle cx="30" cy="35" r="23" fill="none" stroke="#dbd6d1" stroke-width="2.5" />
+  <!-- a framed print on its pin -->
+  <rect x="40" y="6" width="15" height="22" fill="#2a2119" stroke="#f1ede8" stroke-width="2.5" />
+  <circle cx="47.5" cy="31.5" r="2.2" fill="#f1ede8" />
+</svg>
