@@ -136,6 +136,7 @@ The world refuses the category default of a navy space globe with a glowing atmo
 **Key Characteristics:**
 
 - Velvet black ground with a fine warm burr of grain over everything.
+- A mezzotint night sky: silver stars and a faint grained Milky Way behind the globe, never blue.
 - Silver is the only light; brightness carries meaning (films, selection, attention).
 - Warm plate brown marks half-scraped states: hover borders, empty selections, dark land.
 - Engraved Cinzel capitals for names, captions and labels; Spectral for reading.
@@ -222,6 +223,8 @@ Exact values live in the sidecar.
 **The Offset Shadow Rule.** Every shadow is offset downward and falls into the black. No zero-offset glows, no coloured shadows, no glass, no backdrop blur; modal backdrops are plain black at 75%.
 
 **The Light Follows Attention Rule.** Posters rest at brightness 0.82 and saturation 0.85, and come to full light on hover, keyboard focus, when pointed at from a list, when selected, or when their country is previewed. In film view every print except the selected or attended one sinks to brightness 0.5. On fine pointers a faint 420px silver radial follows the cursor over the plate. New prints surface out of the dark (from brightness 0.2).
+
+**The Night Sky Rule.** The space around the globe is printed in the same mezzotint, never painted as space art: stars are burnished points in silver, warm white and pewter (thicker along the band), and the Milky Way is a mottled haze with dark dust rifts at no more than 30% opacity. It runs as a wandering ring 20 degrees south on the sky, so it passes behind the globe in the opening view however the globe is turned. No blue, no nebula colour, no glow, no twinkle; the sky stays quieter than the land and the posters.
 
 ## Shapes
 

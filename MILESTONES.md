@@ -179,6 +179,7 @@ Worth a manual look:
       direction rounds (see `PRODUCT.md`, `DESIGN.md`, `.impeccable/surfaces/`)
 - [x] Depth gauge (World → Country → Film → Details) on the left edge; levels above are links back
 - [x] Hovering a country brings its posters up to full light (preview)
+- [x] Night sky in the same mezzotint: silver stars and a grained Milky Way passing behind the globe
 - [x] Details sheet re-laid as a page with a side column for where-to-watch, facts and links
 - [x] Drawn icons (lucide) replace text glyphs; one runtime format ("2 h 2 min") everywhere
 - [x] Uncluttered zoom: country prints spaced about one poster height apart; film view keeps ten

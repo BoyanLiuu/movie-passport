@@ -38,6 +38,7 @@ import {
 import { createPosterElement, posterAt, setPosterVisibility } from "./posters/htmlPosters";
 import { createSpritePosters, type SpritePosters } from "./posters/spritePosters";
 import { createPlateTexture } from "./plateTexture";
+import { createNightSky } from "./nightSky";
 import { installTestHook } from "./testHook";
 
 export type PosterRenderer = "html" | "sprites";
@@ -316,7 +317,7 @@ const GlobeScene = ({
     return () => cancelAnimationFrame(frame);
   }, [targetX, targetY, reducedMotion]);
 
-  // Scene setup once the globe exists: first viewpoint, zoom limits.
+  // Scene setup once the globe exists: first viewpoint, zoom limits, the night sky.
   useEffect(() => {
     const globe = globeRef.current;
     if (!ready || !globe) return;
@@ -331,7 +332,14 @@ const GlobeScene = ({
     controls.maxDistance = radius * 5;
     controls.enablePan = false;
 
-    return installTestHook(globe);
+    const sky = createNightSky();
+    globe.scene().add(sky.group);
+    const removeTestHook = installTestHook(globe);
+    return () => {
+      removeTestHook();
+      globe.scene().remove(sky.group);
+      sky.dispose();
+    };
   }, [ready, handleZoom, aspect]);
 
   // Camera follows the focus target, or zooms back out when it is cleared.

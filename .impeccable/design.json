@@ -346,6 +346,11 @@
         "section": "elevation"
       },
       {
+        "name": "The Night Sky Rule",
+        "body": "The space around the globe is printed in the same mezzotint, never painted as space art: stars are burnished points in silver, warm white and pewter (thicker along the band), and the Milky Way is a mottled haze with dark dust rifts at no more than 30% opacity. It runs as a wandering ring 20 degrees south on the sky, so it passes behind the globe in the opening view however the globe is turned. No blue, no nebula colour, no glow, no twinkle; the sky stays quieter than the land and the posters.",
+        "section": "The space around the globe is printed in the same mezzotint, never painted as space art: stars are burnished points in silver, warm white and pewter (thicker along the band), and the Milky Way is a mottled haze with dark dust rifts at no more than 30% opacity. It runs as a wandering ring 20 degrees south on the sky, so it passes behind the globe in the opening view however the globe is turned. No blue, no nebula colour, no glow, no twinkle; the sky stays quieter than the land and the posters."
+      },
+      {
         "name": "The Fleuron Rule",
         "body": "The details sheet header is closed by a fleuron rule: two smoke hairlines meeting a small open diamond (a 6px square, rotated 45 degrees, pewter outline). It is drawn, never typed as a glyph.",
         "section": "shapes"

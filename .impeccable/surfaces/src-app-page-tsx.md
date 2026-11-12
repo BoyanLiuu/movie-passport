@@ -23,7 +23,8 @@ globe with glowing atmosphere, neon accents and floating poster cards.
 OWN-WORLD: Rocked velvet black ground with fine burr grain; burnished silver as the only light; pewter for
 the half-lit; warm plate brown for half-scraped states. Engraved roman capitals (Cinzel), widely tracked, for
 names and captions; a screen roman (Spectral) for reading. Silver hairline frames, burnished-plate primary
-buttons, square corners, no glass, no glow.
+buttons, square corners, no glass, no glow. The night around the globe (added at the user's request)
+is the same mezzotint: silver and warm-white stars and a faint grained Milky Way, never blue.
 
 STORY: Visitors see silver countries and posters surfacing from black, understand that light means films,
 pick a country or a print, and go deeper (country, film, details) to something they can watch.
