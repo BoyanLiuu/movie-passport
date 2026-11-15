@@ -6,9 +6,8 @@ links back across the globe. About 1,200 real films from TMDB; a non-commercial 
 
 **Live: <https://movie-passport-eight.vercel.app/>**
 
-- **Progress:** [`MILESTONES.md`](MILESTONES.md) — what is done, what is next
-- **Plan and decisions:** [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md) and
-  [`docs/decisions/`](docs/decisions/)
+- **Decisions:** [`docs/decisions/`](docs/decisions/) — why poster rendering, the data source and
+  the performance pass landed as they did
 - **Design:** [`PRODUCT.md`](PRODUCT.md) (who it is for and why) and [`DESIGN.md`](DESIGN.md) (the
   "Velvet Night" visual system)
 

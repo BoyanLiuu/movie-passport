@@ -53,3 +53,6 @@ next-env.d.ts
 /public/data/catalogue-overviews.json
 /public/data/*.tmp
 /public/data/films/
+
+# Next.js rewrites this on every `next dev`; regenerated locally, not tracked
+/AGENTS.md
