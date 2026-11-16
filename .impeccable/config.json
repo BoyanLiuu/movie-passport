@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "assets/readme/source/compose.html"
+        ],
+        "createdAt": "2026-11-16T07:35:08.004Z",
+        "reason": "Claude: .window is a picture frame around a cropped screenshot; the detected text is raster pixels inside the image, not DOM text. Images fill their hairline frame by design, matching DESIGN.md's poster-print rule (2:3 image in a 1px hairline). File is a render-only asset composition source, not product UI."
+      }
+    ]
+  }
+}

@@ -1,28 +1,75 @@
-# Movie Passport
+<p align="center">
+  <img src="./assets/readme/hero.webp" width="100%"
+       alt="Movie Passport: an interactive globe of world cinema. Spin the Earth, pick a country, and see the films it made — its cast, its trailer, and where you can watch it. Ten films from every country, standing as posters on a velvet-black globe.">
+</p>
 
-Travel the world through films: an interactive 3D globe for exploring movies country by country. Spin the Earth,
-pick a country to see what it has made, open a film for its cast, trailer and where to watch it, and follow
-links back across the globe. About 1,200 real films from TMDB; a non-commercial project.
+<p align="center">
+  <a href="https://movie-passport-eight.vercel.app/"><strong>Open the live globe</strong></a>
+  &nbsp;·&nbsp; <a href="PRODUCT.md">What it is for</a>
+  &nbsp;·&nbsp; <a href="DESIGN.md">The Velvet Night design system</a>
+  &nbsp;·&nbsp; <a href="docs/decisions/">Decisions</a>
+</p>
 
-**Live: <https://movie-passport-eight.vercel.app/>**
+## The globe is the index
 
-- **Decisions:** [`docs/decisions/`](docs/decisions/) — why poster rendering, the data source and
-  the performance pass landed as they did
-- **Design:** [`PRODUCT.md`](PRODUCT.md) (who it is for and why) and [`DESIGN.md`](DESIGN.md) (the
-  "Velvet Night" visual system)
+Film sites list countries as metadata. Here the country is the way in. Every film is pinned in the
+country that made it and listed under everyone who co-produced it, and places a world map has no
+shape for (Hong Kong, Malta) or that no longer exist (the Soviet Union, Yugoslavia) still get a
+place of their own.
 
-Built with Next.js 16 (App Router), TypeScript, Tailwind CSS 4, [react-globe.gl](https://github.com/vasturiano/react-globe.gl)
-and three.js.
+Silver countries have films — the brighter, the more. Click one and the camera flies to it.
+
+![Japan selected on the globe: the country is burnished silver with three posters standing on it, and a panel lists 10 films from Japan and 13 it co-produced, from the 1970s to the 2020s — Spirited Away, Your Name., Howl's Moving Castle, Princess Mononoke, My Neighbor Totoro, Grave of the Fireflies.](./assets/readme/japan.webp)
+
+## Using it
+
+- **Drag** to rotate, **scroll / pinch** to zoom. The globe turns slowly when left alone.
+- **Hover** a country for its name and film count; **click / tap** to fly to it. A country with no
+  films suggests nearby ones that do.
+- The panel separates the films **from** a country from the ones it **co-produced**, with counts
+  and decades.
+- **Click a poster** — or a film in the list — to open its card: the camera flies to it, every
+  production country lights up, and the other posters dim. Posters are also reachable with **Tab**
+  and **Enter**.
+- Press **/** to search countries and films. It matches ISO codes (`jp`), original titles and
+  directors as well as titles.
+- With _reduce motion_ turned on in your OS, auto-rotation is off and camera moves are instant.
+
+![Three details, shown close up. One: the Soviet Union panel, labelled “Historical state, 1922–1991”, with 10 films from it and 4 co-productions across the 1920s to the 1980s. Two: the search field holding “kuro”, offering Dersu Uzala, 1975, Soviet Union and Japan. Three: the film card for Spirited Away, with 千と千尋の神隠し set beneath the English title, 2001, 2 h 5 min, 8.5 / 10, Hayao Miyazaki.](./assets/readme/moments.webp)
+
+## Every view has a link
+
+`?country=JP`, `?film=129`, `?film=129&details` — browser Back and Forward move between views, and
+any view can be shared. The gauge on the left edge shows how deep you are, and the levels above it
+are links back out; **Back to globe** or **Esc** steps out too.
+
+![The four levels as a flat plate gauge: World at “/”, the whole globe; Country at “?country=JP”, what Japan made; Film at “?film=129”, one film lit up; Details at “?film=129&details”, cast, trailer and where to watch. Every view has its own link, so Back, Forward and shared links all work.](./assets/readme/depth.svg)
+
+## It ends at a film you can watch
+
+**More details** opens the film's page over the globe: cast and crew, the trailer (loaded from
+YouTube only when you press play), where to stream, rent or buy it in your region, facts, more
+films from the same country, and similar films.
+
+![The film page for Spirited Away over the globe: the poster beside the title and year, the Japanese title, a PG certificate, 20 July 2001, Animation, Family, Fantasy, 2 h 5 min, 85% user score from 19,218 votes on TMDB, the tagline, the overview, Hayao Miyazaki as director and screenwriter, a cast rail of greyscale portraits with roles, and a side column offering a region selector and HBO Max to stream.](./assets/readme/details.webp)
 
 ## Getting started
 
-Requires Node 20.9+ (developed on 24). pnpm comes from corepack: run `corepack enable` once, or prefix
-commands with `corepack`.
+Requires Node 20.9+ (developed on 24). pnpm comes from corepack: run `corepack enable` once, or
+prefix commands with `corepack`.
 
 ```bash
 pnpm install
 pnpm dev                 # http://127.0.0.1:3002
 ```
+
+That is enough to spin the globe. Without TMDB data the app shows a hand-picked sample of 20 films
+with generated poster art (`src/data/movies.ts`); see [Data](#data) to fetch the real catalogue.
+
+`pnpm check` runs lint, typecheck, unit tests and the production build.
+
+<details>
+<summary>All commands</summary>
 
 | Command               | What it does                                                              |
 | --------------------- | ------------------------------------------------------------------------- |
@@ -39,28 +86,12 @@ pnpm dev                 # http://127.0.0.1:3002
 
 The first `pnpm test:e2e` needs a Playwright browser: `pnpm exec playwright install chromium`.
 
-## Using it
-
-- **Drag** to rotate, **scroll / pinch** to zoom. The globe turns slowly when left alone.
-- **Silver countries have films**: the more films, the brighter. **Hover** a country to see its
-  name and film count and bring its posters up to full light; **click / tap** to fly to it.
-- In a country, the panel lists the films **from** it (its main country) and the ones it
-  **co-produced**, with counts and decades. A country with no films suggests nearby ones that do.
-- **Click / tap a poster** (or a film in a list) to open the film card: the camera flies to it,
-  every production country lights up, and the other posters dim. Posters are also reachable with
-  **Tab** and **Enter**.
-- **More details** opens the film's page over the globe: cast and crew, the trailer (loaded from
-  YouTube only when you press play), where to stream, rent or buy it in your region (from
-  JustWatch), facts, more films from the same country and similar films.
-- **Search** (press **/**) for a country or a film: arrow keys and Enter work, and it finds
-  ISO codes ("jp"), original titles and directors.
-- The gauge on the left edge shows how deep you are (World, Country, Film, Details); the levels
-  above are links back. **Back to globe** or **Esc** also steps out.
-- Every view has its own link — `?country=FR`, `?film=194`, `?film=194&details` — so browser
-  Back/Forward and shared links work.
-- With _reduce motion_ turned on in your OS, auto-rotation is off and camera moves are instant.
+</details>
 
 ## How it fits together
+
+Next.js 16 (App Router), TypeScript, Tailwind CSS 4,
+[react-globe.gl](https://github.com/vasturiano/react-globe.gl) and three.js.
 
 ```
 src/components/globe/MovieGlobe.tsx       app state (world / country / film), overlays, Esc, URL
@@ -82,8 +113,8 @@ src/data/movies.ts                        sample catalogue used without TMDB dat
 `GlobeScene` is loaded with `next/dynamic` and `ssr: false`: WebGL only exists in the browser.
 
 Clicks are resolved from the pointer's release position (`toGlobeCoords` + point-in-polygon) rather
-than react-globe.gl's `onPolygonClick`, which reports its last _throttled_ hover raycast and can miss
-quick taps.
+than react-globe.gl's `onPolygonClick`, which reports its last _throttled_ hover raycast and can
+miss quick taps.
 
 ### Performance
 
@@ -112,13 +143,15 @@ build time and never committed** — TMDB's terms forbid redistributing it:
 1. Get a free API Read Access Token at <https://www.themoviedb.org/settings/api>.
 2. `cp .env.example .env.local` and set `TMDB_READ_TOKEN`. `.env.local` is gitignored; the token is
    only read by the fetch script and never reaches the browser.
-3. `pnpm data:catalogue` — the 10 most-voted films from each country and small place (1,171
-   films), plus one details file per film for the details sheet, written to `public/data/`
+3. `pnpm data:catalogue` — the 10 most-voted films from each country and small place (about 1,170
+   films, spanning 1898 to now), plus one details file per film, written to `public/data/`
    (gitignored). Re-run monthly: TMDB allows caching for at most 6 months.
 
-Without a catalogue the app shows a hand-picked sample of 20 films with generated poster art
-(`src/data/movies.ts`); the browser tests always use that sample. See
-[`docs/decisions/0002-movie-data-source.md`](docs/decisions/0002-movie-data-source.md).
+See [`docs/decisions/0002-movie-data-source.md`](docs/decisions/0002-movie-data-source.md) for why
+TMDB, and why the sample catalogue exists.
+
+This product uses the TMDB API but is not endorsed or certified by TMDB. The screenshots above show
+TMDB artwork and metadata as the app displays it, with the same credit.
 
 Typefaces: [Cinzel](https://fonts.google.com/specimen/Cinzel) and
 [Spectral](https://fonts.google.com/specimen/Spectral) (SIL Open Font License), self-hosted at build
@@ -142,3 +175,5 @@ limit.
 Add `?debug` to the URL for a frame-rate meter and the poster-rendering controls, e.g.
 `/?debug&renderer=sprites&posters=1000&cap=0`. See
 [`docs/decisions/0001-poster-rendering.md`](docs/decisions/0001-poster-rendering.md).
+
+A non-commercial project.

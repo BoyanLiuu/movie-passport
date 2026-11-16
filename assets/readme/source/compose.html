@@ -1,0 +1,332 @@
+<!doctype html>
+<!--
+  README asset composition source for Movie Passport.
+
+  Each .asset block below is screenshotted 1:1 with Playwright and written to
+  assets/readme/*.webp. The screenshots in ./ are captured from the live app at
+  a 1440x900 viewport, so every crop window here is placed at native scale.
+
+  Type is the real product type (Cinzel + Spectral, loaded from Google Fonts at
+  render time only); the published assets are raster, so nothing remote ships.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --silver-bright: #f1ede8;
+        --silver: #dbd6d1;
+        --pewter: #a7a39a;
+        --plate: #5a4a3a;
+        --plate-deep: #2a2119;
+        --smoke: #3c3a37;
+        --velvet-raised: #121110;
+        --velvet: #0b0b0b;
+        --cinzel: "Cinzel", "Trajan Pro", Georgia, serif;
+        --spectral: "Spectral", Georgia, "Times New Roman", serif;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #202020;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+        align-items: flex-start;
+      }
+
+      /* A rocked mezzotint plate: velvet ground under a fine warm stipple. */
+      .asset {
+        position: relative;
+        overflow: hidden;
+        background-color: var(--velvet);
+        color: var(--silver);
+      }
+
+      .asset::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(
+          circle at 1px 1px,
+          rgba(167, 163, 154, 0.055) 0.5px,
+          transparent 0.6px
+        );
+        background-size: 3px 3px;
+        pointer-events: none;
+        z-index: 3;
+      }
+
+      /* Burnished points of a mezzotint sky, drawn only where no screenshot sits. */
+      .stars {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+      }
+      .stars i {
+        position: absolute;
+        background: var(--silver-bright);
+        border-radius: 50%;
+        width: 1.6px;
+        height: 1.6px;
+      }
+
+      .shot {
+        position: absolute;
+        background-repeat: no-repeat;
+        z-index: 1;
+      }
+
+      /* ---------- hero ---------- */
+
+      #hero {
+        width: 1200px;
+        height: 420px;
+      }
+
+      #hero .globe {
+        top: 0;
+        right: 0;
+        width: 600px;
+        height: 420px;
+        background-image: url("./shot-world.webp");
+        background-size: 821px 513px; /* 1440x900 at 0.57 */
+        background-position: -80px -42px;
+        /* Light falls off into the velvet instead of ending at a seam. */
+        -webkit-mask-image: radial-gradient(circle 268px at 330px 215px, #000 72%, transparent 100%);
+        mask-image: radial-gradient(circle 268px at 330px 215px, #000 72%, transparent 100%);
+      }
+
+      #hero .title-block {
+        position: absolute;
+        left: 64px;
+        top: 58px;
+        width: 556px;
+        z-index: 2;
+      }
+
+      .wordmark {
+        font-family: var(--cinzel);
+        font-weight: 500;
+        font-size: 46px;
+        letter-spacing: 0.17em;
+        color: var(--silver-bright);
+        line-height: 1;
+      }
+
+      .tagline {
+        font-family: var(--spectral);
+        font-style: italic;
+        font-size: 21px;
+        color: var(--pewter);
+        margin-top: 18px;
+      }
+
+      /* The fleuron rule: two hairlines meeting a small open diamond. */
+      .fleuron {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 24px 0 24px;
+      }
+      .fleuron span {
+        height: 1px;
+        background: var(--smoke);
+      }
+      .fleuron span:first-child {
+        width: 150px;
+      }
+      .fleuron span:last-child {
+        flex: 1;
+      }
+      .fleuron b {
+        width: 7px;
+        height: 7px;
+        border: 1px solid var(--pewter);
+        transform: rotate(45deg);
+      }
+
+      .lede {
+        font-family: var(--spectral);
+        font-size: 20px;
+        line-height: 1.7;
+        color: var(--silver);
+      }
+
+      .meta {
+        font-family: var(--cinzel);
+        font-size: 16px;
+        letter-spacing: 0.2em;
+        color: var(--pewter);
+        margin-top: 28px;
+      }
+
+      /* ---------- plain crops ---------- */
+
+      #japan,
+      #details {
+        background: transparent;
+      }
+      #japan::before,
+      #details::before {
+        display: none;
+      }
+
+      #japan {
+        width: 1108px;
+        height: 892px;
+      }
+      #japan .crop {
+        inset: 0;
+        background-image: url("./shot-country-jp.webp");
+        background-position: -332px 0;
+      }
+
+      #details {
+        width: 1024px;
+        height: 812px;
+      }
+      #details .crop {
+        inset: 0;
+        background-image: url("./shot-details.webp");
+        background-position: -208px -88px;
+      }
+
+      /* ---------- three-cell evidence strip ---------- */
+
+      #moments {
+        width: 1200px;
+        height: 424px;
+      }
+
+      #moments .strip {
+        position: absolute;
+        inset: 52px 52px;
+        display: flex;
+        justify-content: space-between;
+        z-index: 2;
+      }
+
+      .cell {
+        width: 354px;
+      }
+
+      /* Each window is a print on the plate: hairline frame, shadow into the black. */
+      .window {
+        position: relative;
+        width: 354px;
+        height: 240px;
+        overflow: hidden;
+        border: 1px solid var(--smoke);
+        box-shadow: 0 10px 24px -6px rgba(0, 0, 0, 0.9);
+        background: var(--velvet-raised);
+      }
+      .window div {
+        position: absolute;
+        inset: 0;
+        background-repeat: no-repeat;
+      }
+
+      .cap {
+        font-family: var(--cinzel);
+        font-size: 15px;
+        font-weight: 500;
+        letter-spacing: 0.2em;
+        color: var(--silver-bright);
+        margin-top: 22px;
+      }
+      .sub {
+        font-family: var(--spectral);
+        font-style: italic;
+        font-size: 16px;
+        line-height: 1.45;
+        color: var(--pewter);
+        margin-top: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- HERO: engraved title plate, with the live globe burnished into the right half. -->
+    <div class="asset" id="hero">
+      <div class="stars"></div>
+      <div class="shot globe"></div>
+      <div class="title-block">
+        <div class="wordmark">MOVIE PASSPORT</div>
+        <div class="tagline">Travel the world through films.</div>
+        <div class="fleuron"><span></span><b></b><span></span></div>
+        <div class="lede">
+          An interactive globe of world cinema. Spin the<br />
+          Earth, pick a country, and see the films it made —<br />
+          its cast, its trailer, and where you can watch it.
+        </div>
+        <div class="meta">TEN FILMS FROM EVERY COUNTRY</div>
+      </div>
+    </div>
+
+    <!-- PROOF: a country selected. -->
+    <div class="asset" id="japan"><div class="shot crop"></div></div>
+
+    <!-- PROOF: the film's page. -->
+    <div class="asset" id="details"><div class="shot crop"></div></div>
+
+    <!-- EVIDENCE STRIP: three details shown at native scale. -->
+    <div class="asset" id="moments">
+      <div class="stars"></div>
+      <div class="strip">
+        <div class="cell">
+          <div class="window">
+            <div style="background-image: url('./shot-historical.webp'); background-position: -1040px -100px"></div>
+          </div>
+          <div class="cap">PLACES THAT NO LONGER EXIST</div>
+          <div class="sub">States the world map dropped keep their own plate, dated, never merged into a successor.</div>
+        </div>
+        <div class="cell">
+          <div class="window">
+            <div style="background-image: url('./shot-search.webp'); background-position: -542px -14px"></div>
+          </div>
+          <div class="cap">SEARCH KNOWS DIRECTORS</div>
+          <div class="sub">Four letters of &ldquo;Kurosawa&rdquo; reach a 1975 Soviet&ndash;Japanese co-production.</div>
+        </div>
+        <div class="cell">
+          <div class="window">
+            <div style="background-image: url('./shot-film-card.webp'); background-position: -1040px -95px"></div>
+          </div>
+          <div class="cap">TITLES AS THEY WERE MADE</div>
+          <div class="sub">The original title sits under the English one, in its own script.</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Sparse burnished points, deterministic so re-renders are identical.
+      let seed = 20261115;
+      const rnd = () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
+      for (const host of document.querySelectorAll(".stars")) {
+        const w = host.parentElement.offsetWidth;
+        const h = host.parentElement.offsetHeight;
+        const n = Math.round((w * h) / 9000);
+        for (let i = 0; i < n; i++) {
+          const s = document.createElement("i");
+          const r = 0.7 + rnd() * 1.1;
+          s.style.width = s.style.height = r.toFixed(2) + "px";
+          s.style.left = (rnd() * w).toFixed(1) + "px";
+          s.style.top = (rnd() * h).toFixed(1) + "px";
+          s.style.opacity = (0.14 + rnd() * 0.4).toFixed(2);
+          host.appendChild(s);
+        }
+      }
+    </script>
+  </body>
+</html>

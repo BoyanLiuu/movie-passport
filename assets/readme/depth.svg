@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300"
+     role="img" aria-labelledby="depth-title depth-desc">
+  <title id="depth-title">The four levels of Movie Passport, and the link that addresses each one</title>
+  <desc id="depth-desc">A horizontal plate gauge with four burnished points: World, at the path slash, the whole globe; Country, at question mark country equals JP, what Japan made; Film, at question mark film equals 129, one film lit up; Details, at question mark film equals 129 and details, cast, trailer and where to watch. Every view has its own link, so Back, Forward and shared links all work.</desc>
+
+  <defs>
+    <!-- The rocked plate: an even warm stipple, the ground every view sits on. -->
+    <pattern id="burr" width="4" height="4" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="0.4" fill="#a7a39a" opacity="0.07"/>
+      <circle cx="3" cy="3" r="0.4" fill="#a7a39a" opacity="0.05"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="300" fill="#0b0b0b"/>
+  <rect width="1200" height="300" fill="url(#burr)"/>
+
+  <!-- The gauge rail, laid flat: depth as navigation. -->
+  <g id="rail">
+    <line x1="72" y1="72" x2="888" y2="72" stroke="#3c3a37" stroke-width="1"/>
+    <line x1="888" y1="72" x2="1128" y2="72" stroke="#3c3a37" stroke-width="1" opacity="0.45"/>
+    <circle cx="72" cy="72" r="4.5" fill="#a7a39a"/>
+    <circle cx="344" cy="72" r="4.5" fill="#a7a39a"/>
+    <circle cx="616" cy="72" r="4.5" fill="#a7a39a"/>
+    <circle cx="888" cy="72" r="4.5" fill="#a7a39a"/>
+  </g>
+
+  <g font-family="Georgia, 'Times New Roman', serif">
+    <!-- WORLD -->
+    <g transform="translate(72 0)">
+      <text y="126" font-size="28" letter-spacing="5.6" fill="#f1ede8">WORLD</text>
+      <text y="168" font-size="20" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#dbd6d1">/</text>
+      <text y="204" font-size="20" font-style="italic" fill="#a7a39a">the whole globe</text>
+    </g>
+    <!-- COUNTRY -->
+    <g transform="translate(344 0)">
+      <text y="126" font-size="28" letter-spacing="5.6" fill="#f1ede8">COUNTRY</text>
+      <text y="168" font-size="20" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#dbd6d1">?country=JP</text>
+      <text y="204" font-size="20" font-style="italic" fill="#a7a39a">what Japan made</text>
+    </g>
+    <!-- FILM -->
+    <g transform="translate(616 0)">
+      <text y="126" font-size="28" letter-spacing="5.6" fill="#f1ede8">FILM</text>
+      <text y="168" font-size="20" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#dbd6d1">?film=129</text>
+      <text y="204" font-size="20" font-style="italic" fill="#a7a39a">one film, lit up</text>
+    </g>
+    <!-- DETAILS -->
+    <g transform="translate(888 0)">
+      <text y="126" font-size="28" letter-spacing="5.6" fill="#f1ede8">DETAILS</text>
+      <text y="168" font-size="20" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" fill="#dbd6d1">?film=129&amp;details</text>
+      <text y="204" font-size="20" font-style="italic" fill="#a7a39a">cast, trailer, watch</text>
+    </g>
+
+    <!-- The fleuron rule closes the gauge, as it closes the details header. -->
+    <g id="fleuron">
+      <line x1="72" y1="244" x2="586" y2="244" stroke="#3c3a37" stroke-width="1"/>
+      <rect x="596" y="240" width="8" height="8" fill="none" stroke="#a7a39a" stroke-width="1" transform="rotate(45 600 244)"/>
+      <line x1="614" y1="244" x2="1128" y2="244" stroke="#3c3a37" stroke-width="1"/>
+    </g>
+
+    <text x="600" y="283" font-size="20" text-anchor="middle" fill="#a7a39a">Every view has its own link, so Back, Forward and shared links all work.</text>
+  </g>
+</svg>
